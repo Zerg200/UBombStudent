@@ -57,5 +57,4 @@ public class Game {
         return this.player;
     }
 
-
 }

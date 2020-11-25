@@ -1,27 +1,21 @@
-/*
- * Copyright (c) 2020. Laurent Réveillère
- */
-
-package fr.ubx.poo.model.go.character;
+package fr.ubx.poo.model.go.monsters;
 
 import fr.ubx.poo.game.Direction;
+import fr.ubx.poo.game.Game;
 import fr.ubx.poo.game.Position;
 import fr.ubx.poo.model.Movable;
 import fr.ubx.poo.model.go.GameObject;
-import fr.ubx.poo.game.Game;
 
-public class Player extends GameObject implements Movable {
+public class Monster extends GameObject implements Movable {
 
     private final boolean alive = true;
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 1;
-    private boolean winner;
 
-    public Player(Game game, Position position) {
+    public Monster(Game game, Position position) {
         super(game, position);
         this.direction = Direction.S;
-        this.lives = game.getInitPlayerLives();
     }
 
     public int getLives() {
@@ -44,26 +38,11 @@ public class Player extends GameObject implements Movable {
         return true;
     }
 
+
+    @Override
     public void doMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
-        if(nextPos.x > -1 && nextPos.y > -1
-                && nextPos.x < game.getWorld().dimension.width
-                && nextPos.y < game.getWorld().dimension.height) {
-            if(!(game.getWorld().isEmpty(nextPos))){
-                if(!(game.getWorld().get(nextPos).toString().equals("Tree"))
-                        && !(game.getWorld().get(nextPos).toString().equals("Stone")))
-                setPosition(nextPos);
-            }
-            else{
-                setPosition(nextPos);
-            }
-
-        }
-        if(game.getWorld().isEmpty(nextPos))
-            System.out.println("Empty");
-        else
-            System.out.println("" + game.getWorld().get(nextPos).toString());
-        System.out.println("" + nextPos);
+        setPosition(nextPos);
     }
 
     public void update(long now) {
@@ -75,12 +54,7 @@ public class Player extends GameObject implements Movable {
         moveRequested = false;
     }
 
-    public boolean isWinner() {
-        return winner;
-    }
-
     public boolean isAlive() {
         return alive;
     }
-
 }

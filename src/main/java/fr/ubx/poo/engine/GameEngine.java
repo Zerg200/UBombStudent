@@ -5,6 +5,7 @@
 package fr.ubx.poo.engine;
 
 import fr.ubx.poo.game.Direction;
+import fr.ubx.poo.model.go.monsters.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
 import fr.ubx.poo.view.sprite.SpriteFactory;
 import fr.ubx.poo.game.Game;
@@ -32,6 +33,7 @@ public final class GameEngine {
     private final Game game;
     private final Player player;
     private final List<Sprite> sprites = new ArrayList<>();
+    //private List<Monster> monsters = new ArrayList<>();//НЕ уверен
     private StatusBar statusBar;
     private Pane layer;
     private Input input;
