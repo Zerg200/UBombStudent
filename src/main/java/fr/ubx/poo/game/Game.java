@@ -11,13 +11,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import fr.ubx.poo.model.decor.Decor;
 import fr.ubx.poo.model.go.character.Player;
+import fr.ubx.poo.model.go.monsters.Monster;
 
 public class Game {
 
     private final World world;
     private final Player player;
+    private final Monster monster;
     private final String worldPath;
+    private boolean changeMap;
     public int initPlayerLives;
 
     public Game(String worldPath) {
@@ -25,7 +29,12 @@ public class Game {
         this.worldPath = worldPath;
         loadConfig(worldPath);
         Position positionPlayer = null;
+        Position positionMonster = null;
+        this.changeMap = false;
         try {
+            positionMonster = world.findMonsters();
+            //System.out.println("Monster:" + positionMonster);
+            monster = new Monster(this, positionMonster);
             positionPlayer = world.findPlayer();
             player = new Player(this, positionPlayer);
         } catch (PositionNotFoundException e) {
@@ -55,6 +64,17 @@ public class Game {
 
     public Player getPlayer() {
         return this.player;
+    }
+
+    public Monster getMonster() {
+        return this.monster;
+    }
+
+    public void setChangeMap(boolean changeMap) {
+        this.changeMap = changeMap;
+    }
+    public boolean getChangeMap() {
+        return changeMap;
     }
 
 

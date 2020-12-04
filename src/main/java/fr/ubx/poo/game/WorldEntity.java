@@ -13,7 +13,7 @@ public enum WorldEntity {
     Heart('H'),
     Key('K'),
     Monster('M'),
-    DoorPrevOpened('V'),
+    DoorPrevOpened('V'), //C'est quoi?????
     DoorNextOpened('N'),
     DoorNextClosed('n'),
     Player('P'),
