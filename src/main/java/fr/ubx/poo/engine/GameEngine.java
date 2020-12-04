@@ -5,6 +5,8 @@
 package fr.ubx.poo.engine;
 
 import fr.ubx.poo.game.Direction;
+import fr.ubx.poo.game.Position;
+import fr.ubx.poo.model.decor.Decor;
 import fr.ubx.poo.model.go.monsters.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
 import fr.ubx.poo.view.sprite.SpriteFactory;
@@ -32,6 +34,7 @@ public final class GameEngine {
     private final String windowTitle;
     private final Game game;
     private final Player player;
+    private final Monster monster;
     private final List<Sprite> sprites = new ArrayList<>();
     //private List<Monster> monsters = new ArrayList<>();//НЕ уверен
     private StatusBar statusBar;
@@ -39,11 +42,13 @@ public final class GameEngine {
     private Input input;
     private Stage stage;
     private Sprite spritePlayer;
+    private Sprite spriteMonster;
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
         this.game = game;
         this.player = game.getPlayer();
+        this.monster = game.getMonster();
         initialize(stage, game);
         buildAndSetGameLoop();
     }
@@ -71,6 +76,7 @@ public final class GameEngine {
         // Create decor sprites
         game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
+        spriteMonster = SpriteFactory.createMonster(layer, monster);
 
     }
 
@@ -79,13 +85,20 @@ public final class GameEngine {
             public void handle(long now) {
                 // Check keyboard actions
                 processInput(now);
-
+                //game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
                 // Do actions
                 update(now);
 
                 // Graphic update
                 render();
                 statusBar.update(game);
+                //if(game.getChangeMap()){
+
+                    //sprites.clear();
+                    //game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+                    //Наверное всё перерендривать не нужно
+                    //game.setChangeMap(false);
+               // }
             }
         };
     }
@@ -148,9 +161,11 @@ public final class GameEngine {
         sprites.forEach(Sprite::render);
         // last rendering to have player in the foreground
         spritePlayer.render();
+        spriteMonster.render();
     }
 
     public void start() {
         gameLoop.start();
     }
+
 }

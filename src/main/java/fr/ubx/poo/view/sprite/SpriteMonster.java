@@ -1,6 +1,6 @@
 package fr.ubx.poo.view.sprite;
 
-import fr.ubx.poo.model.go.character.Player;
+
 import fr.ubx.poo.model.go.monsters.Monster;
 import fr.ubx.poo.view.image.ImageFactory;
 import javafx.scene.effect.ColorAdjust;
@@ -16,6 +16,6 @@ public class SpriteMonster extends SpriteGameObject{
     @Override
     public void updateImage() {
         Monster monster = (Monster) go;
-        setImage(ImageFactory.getInstance().getPlayer(monster.getDirection()));
+        setImage(ImageFactory.getInstance().getMonster(monster.getDirection()));
     }
 }
