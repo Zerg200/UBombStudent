@@ -46,7 +46,7 @@ public class StatusBar {
 
         HBox status = new HBox();
         status.getStyleClass().add("status");
-        HBox live = statusGroup(ImageFactory.getInstance().get(HEART), this.liveValue);
+        HBox live = statusGroup(ImageFactory.getInstance().get(HEART), liveValue);
         HBox bombs = statusGroup(ImageFactory.getInstance().get(BANNER_BOMB), bombsValue);
         HBox range = statusGroup(ImageFactory.getInstance().get(BANNER_RANGE), rangeValue);
         HBox key = statusGroup(ImageFactory.getInstance().get(KEY), keyValue);
@@ -82,9 +82,9 @@ public class StatusBar {
     public void update(Game game) {
         updateLevel(1);
         liveValue.setText(String.valueOf(game.getPlayer().getLives()));
-        rangeValue.setText("?");
-        bombsValue.setText("?");
-        keyValue.setText("?");
+        rangeValue.setText(String.valueOf(game.getPlayer().getRange()));
+        bombsValue.setText(String.valueOf(game.getPlayer().getBombs()));
+        keyValue.setText(String.valueOf(game.getPlayer().getKeys()));
     }
 
 }

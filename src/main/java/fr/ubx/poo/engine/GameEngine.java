@@ -85,20 +85,20 @@ public final class GameEngine {
             public void handle(long now) {
                 // Check keyboard actions
                 processInput(now);
-                //game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
                 // Do actions
                 update(now);
-
                 // Graphic update
                 render();
                 statusBar.update(game);
-                //if(game.getChangeMap()){
+                if(game.getChangeMap()){
+                    System.out.println(sprites);
+                    sprites.forEach(Sprite::remove);
+                    sprites.removeAll(sprites);
+                    game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
 
-                    //sprites.clear();
-                    //game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
-                    //Наверное всё перерендривать не нужно
-                    //game.setChangeMap(false);
-               // }
+                    System.out.println(sprites);
+                    game.setChangeMap(false);
+                }
             }
         };
     }
@@ -145,7 +145,7 @@ public final class GameEngine {
 
 
     private void update(long now) {
-        player.update(now);
+            player.update(now);
 
         if (player.isAlive() == false) {
             gameLoop.stop();
@@ -163,6 +163,7 @@ public final class GameEngine {
         spritePlayer.render();
         spriteMonster.render();
     }
+
 
     public void start() {
         gameLoop.start();

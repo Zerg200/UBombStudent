@@ -18,6 +18,7 @@ public final class ImageFactory {
     };
 
     private final ImageResource[] monster_direction = new ImageResource[]{
+            // Direction { N, E, S, W }
             MONSTER_UP, MONSTER_RIGHT, MONSTER_DOWN, MONSTER_LEFT,
     };
 
