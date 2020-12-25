@@ -90,15 +90,6 @@ public final class GameEngine {
                 // Graphic update
                 render();
                 statusBar.update(game);
-                if(game.getChangeMap()){
-                    System.out.println(sprites);
-                    sprites.forEach(Sprite::remove);
-                    sprites.removeAll(sprites);
-                    game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
-
-                    System.out.println(sprites);
-                    game.setChangeMap(false);
-                }
             }
         };
     }
@@ -120,6 +111,12 @@ public final class GameEngine {
         }
         if (input.isMoveUp()) {
             player.requestMove(Direction.N);
+        }
+        if (input.isBomb()) {
+            //player.requestMove(Direction.N);
+        }
+        if (input.isKey()) {
+            player.openDoor();
         }
         input.clear();
     }
@@ -145,7 +142,20 @@ public final class GameEngine {
 
 
     private void update(long now) {
-            player.update(now);
+        if(game.getWorld().getChangeMap()){
+            //System.out.println(sprites);
+            sprites.forEach(Sprite::remove);
+            sprites.removeAll(sprites);
+            game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+
+            //System.out.println(sprites);
+            game.getWorld().setChangeMap(false);
+        }
+
+        player.update(now);
+
+        if(player.getLives() == 0)
+            player.setAliveFalse();
 
         if (player.isAlive() == false) {
             gameLoop.stop();

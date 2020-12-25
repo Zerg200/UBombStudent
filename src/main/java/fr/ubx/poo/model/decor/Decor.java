@@ -7,6 +7,8 @@ package fr.ubx.poo.model.decor;
 import fr.ubx.poo.model.Entity;
 import fr.ubx.poo.model.go.character.Player;
 
+import java.util.Objects;
+
 /***
  * A decor is an element that does not know its own position in the grid.
  */
@@ -36,5 +38,16 @@ public class Decor extends Entity {
     public void take(Player player) {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Decor decor = (Decor) o;
+        return passability == decor.passability && collectables == decor.collectables && movability == decor.movability;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(passability, collectables, movability);
+    }
 }

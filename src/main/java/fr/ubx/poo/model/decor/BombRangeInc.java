@@ -8,7 +8,7 @@ public class BombRangeInc extends Decor{
     }
 
     public void take(Player player) {
-        player.increaseRange(1);
+        player.changeRange(1);
     }
 
     public String toString() {

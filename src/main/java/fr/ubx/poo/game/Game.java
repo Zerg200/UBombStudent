@@ -21,7 +21,6 @@ public class Game {
     private final Player player;
     private final Monster monster;
     private final String worldPath;
-    private boolean changeMap;
     public int initPlayerLives;
 
     public Game(String worldPath) {
@@ -30,7 +29,6 @@ public class Game {
         loadConfig(worldPath);
         Position positionPlayer = null;
         Position positionMonster = null;
-        this.changeMap = false;
         try {
             positionMonster = world.findMonsters();
             //System.out.println("Monster:" + positionMonster);
@@ -70,12 +68,6 @@ public class Game {
         return this.monster;
     }
 
-    public void setChangeMap(boolean changeMap) {
-        this.changeMap = changeMap;
-    }
-    public boolean getChangeMap() {
-        return changeMap;
-    }
 
 
 }
