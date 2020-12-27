@@ -19,7 +19,7 @@ public class Game {
 
     private final World world;
     private final Player player;
-    private final Monster monster;
+    private final Monster monster; //Cделать как список
     private final String worldPath;
     public int initPlayerLives;
 
@@ -31,7 +31,6 @@ public class Game {
         Position positionMonster = null;
         try {
             positionMonster = world.findMonsters();
-            //System.out.println("Monster:" + positionMonster);
             monster = new Monster(this, positionMonster);
             positionPlayer = world.findPlayer();
             player = new Player(this, positionPlayer);

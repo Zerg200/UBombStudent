@@ -14,9 +14,6 @@ import fr.ubx.poo.model.decor.DoorNextOpened;
 import fr.ubx.poo.model.go.GameObject;
 import fr.ubx.poo.game.Game;
 
-import static fr.ubx.poo.game.Direction.N;
-import static fr.ubx.poo.game.WorldEntity.DoorNextClosed;
-
 public class Player extends GameObject implements Movable {
 
     private boolean alive = true;

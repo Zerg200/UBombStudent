@@ -38,6 +38,7 @@ public class World {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.Monster) {
+                    System.out.println(y + " " + x);
                     return new Position(x, y);
                 }
             }
@@ -77,6 +78,7 @@ public class World {
     public void setChangeMap(boolean changeMap) {
         this.changeMap = changeMap;
     }
+
     public boolean getChangeMap() {
         return changeMap;
     }
