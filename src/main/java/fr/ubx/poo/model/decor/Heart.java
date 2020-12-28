@@ -12,6 +12,6 @@ public class Heart extends Decor{
     }
 
     public void take(Player player) {
-        player.increaseLives();
+        player.changeLives(1);
     }
 }

@@ -52,7 +52,7 @@ public final class GameEngine {
         this.game = game;
         this.player = game.getPlayer();
         this.monster = game.getMonster();
-        this.bombs = game.getBomb();
+        this.bombs = game.getBombs();
         initialize(stage, game);
         buildAndSetGameLoop();
     }
@@ -82,7 +82,7 @@ public final class GameEngine {
         spritePlayer = SpriteFactory.createPlayer(layer, player);
         spriteMonster = SpriteFactory.createMonster(layer, monster);
 
-        bombs = game.getBomb();
+        bombs = game.getBombs();
 
     }
 
@@ -152,16 +152,17 @@ public final class GameEngine {
         player.update(now);
 
         for(int i = 0; i < bombs.size(); i++) {
-            if(bombs.get(i).getIsNew() == true){
+            if(bombs.get(i).getIsNew()[0] == true){
                 bombs.get(i).setTime(now);
-                bombs.get(i).setIsNew(false);
-                spritesBomb.add(SpriteFactory.createBomb(layer, bombs.get(i)));
+                bombs.get(i).setIsNew(false, true);
+                spritesBomb.add(SpriteFactory.createBomb(layer, bombs.get(i))); // поменять
             }
             else{
-                if(!bombs.get(i).update(now)){
+                if(!bombs.get(i).update(now) || bombs.get(i).getLives() == 0){
                     bombs.remove(i);
-                    spritesBomb.get(i).remove();
-                    spritesBomb.remove(i);
+                    spritesBomb.get(i).remove();// поменять
+                    spritesBomb.remove(i); // поменять
+                    player.changeBombNumber(1);
                 }
             }
         }

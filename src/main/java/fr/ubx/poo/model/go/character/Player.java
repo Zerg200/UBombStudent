@@ -46,6 +46,14 @@ public class Player extends GameObject implements Movable {
         return range;
     }
 
+    public boolean getCanBeDamaged() {
+        return canBeDamaged;
+    }
+
+    public void setCanBeDamaged(boolean canBeDamaged) {
+        this.canBeDamaged = canBeDamaged;
+    }
+
     public int getKeys() {
         return keys;
     }
@@ -74,8 +82,8 @@ public class Player extends GameObject implements Movable {
         this.keys++;
     }
 
-    public void increaseLives() {
-        this.lives++;
+    public void changeLives(int n) {
+        this.lives += n;
     }
 
     public Direction getDirection() {
@@ -93,7 +101,7 @@ public class Player extends GameObject implements Movable {
         //Position nextPos = direction.nextPosition(getPosition());
 
         if(game.getWorld().isEmpty(getPosition()) && bombs > 0) {
-            System.out.println("game.getWorld()");
+            //System.out.println("game.getWorld()");
             //game.getWorld().setBombs(nextPos);
             Bomb bomb = new Bomb(game, getPosition(), range, 0);
             game.setBomb(bomb);

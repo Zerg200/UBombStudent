@@ -71,7 +71,7 @@ public class Game {
         return this.monster;
     }
 
-    public List<Bomb> getBomb() {
+    public List<Bomb> getBombs() {
         return bombs;
     }
 
