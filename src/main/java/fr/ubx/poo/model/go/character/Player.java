@@ -13,6 +13,8 @@ import fr.ubx.poo.model.decor.DoorNextClosed;
 import fr.ubx.poo.model.decor.DoorNextOpened;
 import fr.ubx.poo.model.go.GameObject;
 import fr.ubx.poo.game.Game;
+import fr.ubx.poo.model.go.bombs.Bomb;
+import fr.ubx.poo.view.sprite.SpriteFactory;
 
 public class Player extends GameObject implements Movable {
 
@@ -21,7 +23,7 @@ public class Player extends GameObject implements Movable {
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 3;
-    private int bombs = 0;
+    private int bombs = 1;
     private int range = 1;
     private int keys = 0;
     private boolean winner;
@@ -87,8 +89,19 @@ public class Player extends GameObject implements Movable {
         moveRequested = true;
     }
 
-    public void placeBomb(Direction direction) {
+    public void placeBomb() {
+        //Position nextPos = direction.nextPosition(getPosition());
 
+        if(game.getWorld().isEmpty(getPosition()) && bombs > 0) {
+            System.out.println("game.getWorld()");
+            //game.getWorld().setBombs(nextPos);
+            Bomb bomb = new Bomb(game, getPosition(), range, 0);
+            game.setBomb(bomb);
+            bomb = null;
+            changeBombNumber(-1);
+            //game.getWorld().setChangeMap(true);
+
+        }
     }
 
     public void openDoor() {
@@ -98,7 +111,7 @@ public class Player extends GameObject implements Movable {
             //System.out.println("game.getWorld().get(nextPos)" + game.getWorld().get(nextPos));
             //System.out.println(game.getWorld().get(nextPos).equals(new DoorNextClosed()));
             if(game.getWorld().get(nextPos).equals(new DoorNextClosed()) && keys > 0){
-                System.out.println("!");
+                //System.out.println("!");
                 keys--;
                 game.getWorld().set(nextPos, new DoorNextOpened());
                 game.getWorld().setChangeMap(true);
@@ -111,6 +124,7 @@ public class Player extends GameObject implements Movable {
     public boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
         //System.out.println(direction + " " + nextPos + " " + game.getWorld().get(nextPos));
+        //System.out.println(game.getWorld().getRaw(nextPos));
 
         if(nextPos.inside(game.getWorld().dimension)) {
             Decor decor = game.getWorld().get(nextPos);
@@ -147,11 +161,10 @@ public class Player extends GameObject implements Movable {
     }
 
     public void update(long now) {
-        for(int i = 0; i < range; i++) {
-            if (moveRequested) {
-                if (canMove(direction)) {
-                    doMove(direction);
-                }
+        //System.out.println(now);
+        if (moveRequested) {
+            if (canMove(direction)) {
+                doMove(direction);
             }
         }
 

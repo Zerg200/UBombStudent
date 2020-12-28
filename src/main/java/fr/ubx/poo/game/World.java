@@ -5,6 +5,8 @@
 package fr.ubx.poo.game;
 
 import fr.ubx.poo.model.decor.Decor;
+import fr.ubx.poo.model.go.bombs.Bomb;
+import fr.ubx.poo.model.go.monsters.Monster;
 
 import java.util.Collection;
 import java.util.Map;
@@ -46,14 +48,19 @@ public class World {
         throw new PositionNotFoundException("Monster");
     }
 
+
     public Decor get(Position position) {
         return grid.get(position);
     }
 
+    public WorldEntity getRaw(Position position) {
+        return raw[position.y][position.x];
+    }
+
     public void set(Position position, Decor decor) {
         grid.put(position, decor);
-
     }
+
 
     public void clear(Position position) {
         grid.remove(position);

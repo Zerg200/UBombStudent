@@ -22,6 +22,11 @@ public final class ImageFactory {
             MONSTER_UP, MONSTER_RIGHT, MONSTER_DOWN, MONSTER_LEFT,
     };
 
+    private final ImageResource[] bomb = new ImageResource[]{
+            // Direction { N, E, S, W }
+            BOMB_1, BOMB_2, BOMB_3, BOMB_4,
+    };
+
     private final ImageResource[] digits = new ImageResource[]{
             DIGIT_0, DIGIT_1, DIGIT_2, DIGIT_3, DIGIT_4,
             DIGIT_5, DIGIT_6, DIGIT_7, DIGIT_8, DIGIT_9,
@@ -64,6 +69,10 @@ public final class ImageFactory {
 
     public Image getMonster(Direction direction) {
         return get(monster_direction[direction.ordinal()]);
+    }
+
+    public Image getBomb(Direction direction) {
+        return get(bomb[direction.ordinal()]);
     }
 
     /**

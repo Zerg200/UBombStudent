@@ -9,9 +9,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
-import fr.ubx.poo.model.decor.Decor;
+import fr.ubx.poo.model.go.bombs.Bomb;
 import fr.ubx.poo.model.go.character.Player;
 import fr.ubx.poo.model.go.monsters.Monster;
 
@@ -19,7 +21,8 @@ public class Game {
 
     private final World world;
     private final Player player;
-    private final Monster monster; //Cделать как список
+    private Monster monster; //Cделать как список
+    private List<Bomb> bombs = new ArrayList<>();
     private final String worldPath;
     public int initPlayerLives;
 
@@ -29,6 +32,7 @@ public class Game {
         loadConfig(worldPath);
         Position positionPlayer = null;
         Position positionMonster = null;
+
         try {
             positionMonster = world.findMonsters();
             monster = new Monster(this, positionMonster);
@@ -67,6 +71,13 @@ public class Game {
         return this.monster;
     }
 
+    public List<Bomb> getBomb() {
+        return bombs;
+    }
+
+    public void setBomb(Bomb bomb) {
+        bombs.add(bomb);
+    }
 
 
 }
