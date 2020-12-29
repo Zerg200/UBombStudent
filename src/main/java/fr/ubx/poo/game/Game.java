@@ -23,6 +23,7 @@ public class Game {
     private final Player player;
     private Monster monster; //Cделать как список
     private List<Bomb> bombs = new ArrayList<>();
+    //private List<Monster> monsters = new ArrayList<>();
     private final String worldPath;
     public int initPlayerLives;
 
@@ -34,6 +35,7 @@ public class Game {
         Position positionMonster = null;
 
         try {
+
             positionMonster = world.findMonsters();
             monster = new Monster(this, positionMonster);
             positionPlayer = world.findPlayer();

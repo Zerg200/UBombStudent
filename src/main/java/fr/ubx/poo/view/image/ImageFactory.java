@@ -24,7 +24,7 @@ public final class ImageFactory {
 
     private final ImageResource[] bomb = new ImageResource[]{
             // Direction { N, E, S, W }
-            BOMB_1, BOMB_2, BOMB_3, BOMB_4,
+           EXPLOSION, BOMB_1, BOMB_2, BOMB_3, BOMB_4,
     };
 
     private final ImageResource[] digits = new ImageResource[]{
@@ -63,6 +63,12 @@ public final class ImageFactory {
         return get(digits[i]);
     }
 
+    public Image getNBomb(int i) {
+        if (i < 0 || i > 9)
+            throw new IllegalArgumentException();
+        return get(bomb[i]);
+    }
+
     public Image getPlayer(Direction direction) {
         return get(directions[direction.ordinal()]);
     }
@@ -71,9 +77,6 @@ public final class ImageFactory {
         return get(monster_direction[direction.ordinal()]);
     }
 
-    public Image getBomb(Direction direction) {
-        return get(bomb[direction.ordinal()]);
-    }
 
     /**
      * Holder

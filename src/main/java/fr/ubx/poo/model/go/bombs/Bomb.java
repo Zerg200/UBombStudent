@@ -17,13 +17,10 @@ import static java.lang.Thread.sleep;
 
 public class Bomb extends GameObject {
 
-    Direction direction;
     private int range;
     private int level;
-    private boolean isNew[] = {true,true};
+    private boolean isNew = true;
     private int lives = 1;
-    private long time = 0;
-    private int cl = 0;
     private List<Bomb> bombs = game.getBombs();
     private Player player = game.getPlayer();
    // private List<Monster> monsters = game.getMonster();
@@ -44,52 +41,37 @@ public class Bomb extends GameObject {
         this.lives = lives;
     }
 
-    public boolean[] getIsNew() {
+    public boolean getIsNew() {
         return isNew;
     }
 
-    public void setIsNew(boolean isNewObj, boolean isNewSprite) {
-        this.isNew[0] = isNewObj;
-        this.isNew[1] = isNewSprite;
+    public void setIsNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
-    public void setTime(long now) {
-        this.time = now;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
 
     public Bomb(Game game, Position position, int range, int level) {
-        super(game, position);
-        direction = Direction.W;
+        super(game, position, 4);
         this.range = range;
         this.level = level;
     }
 
     public boolean update(long now) {
 
-        if(cl < 4) {
-            if(now - time >= 1000000000) {
+        if(getCl() > -1) {
+            if(now - getTime() >= 1000000000) {
                 //System.out.println(now - time);
-                time = now;
+                setTime(now);
                 //System.out.println(cl);
-                cl++;
-                if(cl == 1)
-                    direction = Direction.S;
-                else if(cl == 2)
-                    direction = Direction.E;
-                else
-                    direction = Direction.N;
+                setCl(getCl()-1);;
             }
             return true;
         }
-        damage();
+        damage(1);
         return false;
     }
 
-    public void damage() {
+    public void damage(int j) {
         Position center = getPosition();
 
             if(player.getPosition().x == center.x && player.getPosition().y == center.y && player.getCanBeDamaged())
@@ -97,27 +79,24 @@ public class Bomb extends GameObject {
 
             /*if(monsters.get(j).getPosition().x == center.x && monsters.get(j).getPosition().y == center.y)
                 monster.changeLives(-1);*/
-        for(int i = 0; i < bombs.size(); i++){
+        for(int i = j; i < bombs.size(); i++){
             if(bombs.get(i).getPosition().x == center.x && bombs.get(i).getPosition().y == center.y) {
-                bombs.get(i).setLives(0);
-            }
-        }
-
-            for(int i = 0; i < bombs.size(); i++){
-                if(bombs.get(i).getPosition().x == center.x && bombs.get(i).getPosition().y == center.y) {
+                if(bombs.get(i).getLives() != 0) {
                     bombs.get(i).setLives(0);
                 }
             }
+        }
+
         //System.out.println(getPosition());
         //System.out.println("Player: " + player.getPosition());
-        damageDirection(Direction.N);
-        damageDirection(Direction.S);
-        damageDirection(Direction.W);
-        damageDirection(Direction.E);
+        damageDirection(Direction.N, j);
+        damageDirection(Direction.S, j);
+        damageDirection(Direction.W, j);
+        damageDirection(Direction.E, j);
     }
 
 
-    public void damageDirection(Direction direction) {
+    public void damageDirection(Direction direction, int j) {
         Position nextPos = direction.nextPosition(getPosition());
 
         for(int i = 0; i < range; i++){
@@ -148,9 +127,13 @@ public class Bomb extends GameObject {
             /*if(monster.getPosition() == nextPos)
                 monster.changeLives(-1);*/
 
-            for(int j = 0; j < bombs.size(); j++){
-                if(bombs.get(j).getPosition().x == nextPos.x && bombs.get(j).getPosition().y == nextPos.y) {
-                    bombs.get(j).setLives(0);
+            for(int k = j; k < bombs.size(); k++){
+                if(bombs.get(k).getPosition().x == nextPos.x && bombs.get(k).getPosition().y == nextPos.y) {
+                    if(bombs.get(k).getLives() != 0) {
+                        bombs.get(k).damage(k);
+                        bombs.get(k).setLives(0);
+                    }
+
                 }
             }
 

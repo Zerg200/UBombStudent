@@ -14,7 +14,7 @@ public class Monster extends GameObject implements Movable {
     private int lives = 1;
 
     public Monster(Game game, Position position) {
-        super(game, position);
+        super(game, position, 2);
         this.direction = Direction.S;
     }
 

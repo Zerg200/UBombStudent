@@ -23,13 +23,13 @@ public class Player extends GameObject implements Movable {
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 3;
-    private int bombs = 1;
+    private int bombs = 10;
     private int range = 1;
     private int keys = 0;
     private boolean winner;
 
     public Player(Game game, Position position) {
-        super(game, position);
+        super(game, position, 3);
         this.direction = Direction.S;
         this.lives = game.getInitPlayerLives();
     }
@@ -83,6 +83,8 @@ public class Player extends GameObject implements Movable {
     }
 
     public void changeLives(int n) {
+        if(n < 0)
+            setCanBeDamaged(false);
         this.lives += n;
     }
 
@@ -169,7 +171,23 @@ public class Player extends GameObject implements Movable {
     }
 
     public void update(long now) {
-        //System.out.println(now);
+
+        if(!getCanBeDamaged()) {
+            if(getCl() > -1) {
+                if(now - getTime() >= 1000000000) {
+                    //System.out.println(now - time);
+                    setTime(now);
+                    System.out.println(getCl());
+                    setCl(getCl()-1);;
+                }
+            }
+            else {
+                setCl(3);
+                setCanBeDamaged(true);
+            }
+        }
+
+
         if (moveRequested) {
             if (canMove(direction)) {
                 doMove(direction);

@@ -10,9 +10,11 @@ import fr.ubx.poo.model.decor.Decor;
 import fr.ubx.poo.model.go.bombs.Bomb;
 import fr.ubx.poo.model.go.monsters.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
+import fr.ubx.poo.view.sprite.SpriteBomb;
 import fr.ubx.poo.view.sprite.SpriteFactory;
 import fr.ubx.poo.game.Game;
 import fr.ubx.poo.model.go.character.Player;
+import fr.ubx.poo.view.sprite.SpriteGameObject;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -45,7 +47,7 @@ public final class GameEngine {
     private Stage stage;
     private Sprite spritePlayer;
     private Sprite spriteMonster;
-    private List<Sprite> spritesBomb = new ArrayList<>();;
+    private List<SpriteBomb> spritesBomb = new ArrayList<>();;
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
@@ -152,23 +154,24 @@ public final class GameEngine {
         player.update(now);
 
         for(int i = 0; i < bombs.size(); i++) {
-            if(bombs.get(i).getIsNew()[0] == true){
+            if(bombs.get(i).getIsNew() == true){
                 bombs.get(i).setTime(now);
-                bombs.get(i).setIsNew(false, true);
-                spritesBomb.add(SpriteFactory.createBomb(layer, bombs.get(i))); // поменять
+                bombs.get(i).setIsNew(false);
             }
             else{
+
+
                 if(!bombs.get(i).update(now) || bombs.get(i).getLives() == 0){
                     bombs.remove(i);
-                    spritesBomb.get(i).remove();// поменять
-                    spritesBomb.remove(i); // поменять
+                    spritesBomb.get(i).remove();
+                    spritesBomb.remove(i);
                     player.changeBombNumber(1);
                 }
             }
         }
 
 
-        if(player.getLives() == 0)
+        if(player.getLives() <= 0)
             player.setAliveFalse();
 
         if (player.isAlive() == false) {
@@ -191,12 +194,49 @@ public final class GameEngine {
             game.getWorld().setChangeMap(false);
         }
 
-        for(int i = 0; i < bombs.size(); i++) {
-            if(bombs.get(i) != null){
-                spritesBomb.get(i).render();
+        if(!bombs.isEmpty()) {
+            if(spritesBomb.isEmpty()) {
+                spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
+                spritesBomb.get(0).render();
             }
-
+            else {
+                if(bombs.size() > spritesBomb.size()) {
+                    spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(spritesBomb.size())));
+                    spritesBomb.get(spritesBomb.size()-1).render();
+                }
+                else {
+                    for (int i = 0; i < spritesBomb.size(); i++) {
+                        spritesBomb.get(i).render();
+                    }
+                }
+            }
         }
+        /*if(!bombs.isEmpty()) {
+            for(int i = 0; i < bombs.size(); i++) {
+                if(bombs.get(i) != null){
+                    if(spritesBomb.isEmpty()) {
+                        spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
+                    }
+                    else if(spritesBomb.get(i) != null) {
+                        spritesBomb.get(i).render();
+                    }
+                    else {
+                        spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
+                    }
+                }
+                else {
+                    spritesBomb.get(i).remove();
+                    spritesBomb.remove(i);
+                }
+            }
+        }
+        else {
+            if(!spritesBomb.isEmpty()){
+                spritesBomb.get(0).remove();
+                spritesBomb.remove(0);
+            }
+        }*/
+
 
 
         sprites.forEach(Sprite::render);
