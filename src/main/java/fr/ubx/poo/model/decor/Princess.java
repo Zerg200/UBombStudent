@@ -4,7 +4,7 @@ import fr.ubx.poo.model.go.character.Player;
 
 public class Princess extends Decor{
     public Princess() {
-        super(true, true, false);
+        super(true, true, false, false, false);
     }
 
     public void take(Player player) {

@@ -27,8 +27,11 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static fr.ubx.poo.game.Direction.S;
 
 
 public final class GameEngine {
@@ -36,7 +39,7 @@ public final class GameEngine {
     private static AnimationTimer gameLoop;
     private final String windowTitle;
     private final Game game;
-    private final Player player;
+    private Player player;
     private final Monster monster;
     private List<Bomb> bombs = new ArrayList<>();
     private final List<Sprite> sprites = new ArrayList<>();
@@ -47,7 +50,7 @@ public final class GameEngine {
     private Stage stage;
     private Sprite spritePlayer;
     private Sprite spriteMonster;
-    private List<SpriteBomb> spritesBomb = new ArrayList<>();;
+    private List<SpriteBomb> spritesBomb = new ArrayList<>();
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
@@ -55,17 +58,19 @@ public final class GameEngine {
         this.player = game.getPlayer();
         this.monster = game.getMonster();
         this.bombs = game.getBombs();
-        initialize(stage, game);
+        initialize(stage, game, 0);
         buildAndSetGameLoop();
     }
 
-    private void initialize(Stage stage, Game game) {
+    private void initialize(Stage stage, Game game, int level) {
         this.stage = stage;
         Group root = new Group();
         layer = new Pane();
 
-        int height = game.getWorld().dimension.height;
-        int width = game.getWorld().dimension.width;
+        int height = game.getWorld(level).dimension.height;
+        int width = game.getWorld(level).dimension.width;
+        //System.out.println(height + " " + width);
+
         int sceneWidth = width * Sprite.size;
         int sceneHeight = height * Sprite.size;
         Scene scene = new Scene(root, sceneWidth, sceneHeight + StatusBar.height);
@@ -80,11 +85,13 @@ public final class GameEngine {
         root.getChildren().add(layer);
         statusBar = new StatusBar(root, sceneWidth, sceneHeight, game);
         // Create decor sprites
-        game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+        game.getWorld(level).forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
-        spriteMonster = SpriteFactory.createMonster(layer, monster);
 
-        bombs = game.getBombs();
+        spriteMonster = SpriteFactory.createMonster(layer, monster);
+        if(level == 0 && !game.getBombs().isEmpty())
+            spritesBomb.set(0, (SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
+
 
     }
 
@@ -109,7 +116,7 @@ public final class GameEngine {
             System.exit(0);
         }
         if (input.isMoveDown()) {
-            player.requestMove(Direction.S);
+            player.requestMove(S);
         }
         if (input.isMoveLeft()) {
             player.requestMove(Direction.W);
@@ -151,6 +158,25 @@ public final class GameEngine {
 
     private void update(long now) {
 
+        if(game.getIsNewLevel()[0]){
+            stage.close();
+            //System.out.println(game.getNLevel());
+            initialize(stage, game, game.getNLevel());
+            Position p;
+            if(game.getIsNewLevel()[1]) {
+                p = game.getWorld(game.getNLevel()).findDoorPrevOpened();
+            }
+            else {
+                p = game.getWorld(game.getNLevel()).findDoorNextOpened();
+            }
+            player.setPosition(p);
+            player.setDirection(S);
+            game.setIsNewLevel(false, true);
+            System.out.println("Bombs: " + bombs.isEmpty());
+            System.out.println("Sprites: " + spritesBomb.isEmpty());
+            //spritesBomb.get(0).render();
+        }
+
         player.update(now);
 
         for(int i = 0; i < bombs.size(); i++) {
@@ -185,19 +211,34 @@ public final class GameEngine {
     }
 
     private void render() {
-        if(game.getWorld().getChangeMap()){
+        if(game.getWorld(game.getNLevel()).getChangeMap()){
             //System.out.println(sprites);
             sprites.forEach(Sprite::remove);
             sprites.removeAll(sprites);
-            game.getWorld().forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+            game.getWorld(game.getNLevel()).forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
             //System.out.println(sprites);
-            game.getWorld().setChangeMap(false);
+            game.getWorld(game.getNLevel()).setChangeMap(false);
         }
 
         if(!bombs.isEmpty()) {
             if(spritesBomb.isEmpty()) {
+                /*try{
+                    //System.out.println("Bombs: " + bombs.isEmpty());
+                    //System.out.println("Sprites: " + spritesBomb.isEmpty());
+                    if(!bombs.isEmpty())
+                        spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
+                    if(!spritesBomb.isEmpty()) {
+                        System.out.println(spritesBomb.get(0) + " " +  spritesBomb.isEmpty());
+                        spritesBomb.get(0).render();
+                    }
+
+                }
+                catch (IndexOutOfBoundsException ex){
+                    System.err.println("!!!!!!");
+                }*/
                 spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
                 spritesBomb.get(0).render();
+
             }
             else {
                 if(bombs.size() > spritesBomb.size()) {
@@ -207,9 +248,13 @@ public final class GameEngine {
                 else {
                     for (int i = 0; i < spritesBomb.size(); i++) {
                         spritesBomb.get(i).render();
+                        //System.out.println(bombs.get(0).getPosition());
                     }
                 }
             }
+        }
+        if(game.getNLevel() == 0 && !game.getBombs().isEmpty()) {
+            spritesBomb.get(0).render();
         }
         /*if(!bombs.isEmpty()) {
             for(int i = 0; i < bombs.size(); i++) {

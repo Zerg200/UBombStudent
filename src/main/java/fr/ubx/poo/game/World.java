@@ -20,7 +20,10 @@ public class World {
 
     public World(WorldEntity[][] raw) {
         this.raw = raw;
+
+
         dimension = new Dimension(raw.length, raw[0].length);
+        System.out.println(raw.length + " " + raw[0].length);
         grid = WorldBuilder.build(raw, dimension);
         changeMap = false;
     }
@@ -40,12 +43,36 @@ public class World {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.Monster) {
-                    System.out.println(y + " " + x);
+                    //System.out.println("Monster: " + y + " " + x);
                     return new Position(x, y);
                 }
             }
         }
         throw new PositionNotFoundException("Monster");
+    }
+
+    public Position findDoorPrevOpened() {
+        for (int x = 0; x < dimension.width; x++) {
+            for (int y = 0; y < dimension.height; y++) {
+                if (raw[y][x] == WorldEntity.DoorPrevOpened) {
+                    //System.out.println("DoorPrevOpened: " + y + " " + x);
+                    return new Position(x, y+1);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Position findDoorNextOpened(){
+        for (int x = 0; x < dimension.width; x++) {
+            for (int y = 0; y < dimension.height; y++) {
+                if (raw[y][x] == WorldEntity.DoorNextClosed) {
+                    //System.out.println("DoorNextOpened: " + y + " " + x);
+                    return new Position(x, y+1);
+                }
+            }
+        }
+        return null;
     }
 
 

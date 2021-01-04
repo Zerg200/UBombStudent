@@ -7,7 +7,7 @@ package fr.ubx.poo.model.decor;
 
 public class Tree extends Decor {
     public Tree() {
-        super(false, false, false);
+        super(false, false, false, false, false);
     }
 
     @Override

@@ -4,7 +4,7 @@ import fr.ubx.poo.model.go.character.Player;
 
 public class Heart extends Decor{
     public Heart() {
-        super(true, true, false);
+        super(true, true, false, true, false);
     }
 
     public String toString() {

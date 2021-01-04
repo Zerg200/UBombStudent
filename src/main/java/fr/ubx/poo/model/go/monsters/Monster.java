@@ -12,6 +12,7 @@ public class Monster extends GameObject implements Movable {
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 1;
+    private boolean canGoToNewLevel = false;
 
     public Monster(Game game, Position position) {
         super(game, position, 2);

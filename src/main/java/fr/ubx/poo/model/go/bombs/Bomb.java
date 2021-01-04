@@ -23,6 +23,7 @@ public class Bomb extends GameObject {
     private int lives = 1;
     private List<Bomb> bombs = game.getBombs();
     private Player player = game.getPlayer();
+
    // private List<Monster> monsters = game.getMonster();
 
     public int getRange() {
@@ -59,7 +60,7 @@ public class Bomb extends GameObject {
     public boolean update(long now) {
 
         if(getCl() > -1) {
-            if(now - getTime() >= 1000000000) {
+            if(now - getTime() >= 2000000000) {
                 //System.out.println(now - time);
                 setTime(now);
                 //System.out.println(cl);
@@ -100,26 +101,38 @@ public class Bomb extends GameObject {
         Position nextPos = direction.nextPosition(getPosition());
 
         for(int i = 0; i < range; i++){
-            Decor decor = game.getWorld().get(nextPos);
+            Decor decor = game.getWorld(game.getNLevel()).get(nextPos);
             //System.out.println(nextPos + " " + direction);
             if(decor != null) {
+                if(decor.getDestructible()) {
+                    game.getWorld(game.getNLevel()).clear(nextPos);
+                    game.getWorld(game.getNLevel()).setChangeMap(true);
+                    if(decor.getMovability()){
+                        break;
+                    }
+                }
+                else {
+                    if(!decor.getCollectables()){
+                        break;
+                    }
+                }/*
                 if(decor.getMovability()) {
                     game.getWorld().clear(nextPos);
                     game.getWorld().setChangeMap(true);
                     break;
                 }
                 else if(decor.getCollectables()) {
-                    if(!(decor instanceof Key) &&  !(decor instanceof Princess)) {
+                    if(decor.getDestructible()) {
                         game.getWorld().clear(nextPos);
                         game.getWorld().setChangeMap(true);
                     }
                 }
                 else if(!decor.getPassability()) {
                     break;
-                }
+                }*/
             }
             if(player.getPosition().x == nextPos.x && player.getPosition().y == nextPos.y && player.getCanBeDamaged()) {
-                System.out.println("Player: " + player.getPosition());
+                //System.out.println("Player: " + player.getPosition());
                 player.changeLives(-1);
             }
 
