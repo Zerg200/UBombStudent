@@ -6,7 +6,6 @@ package fr.ubx.poo.engine;
 
 import fr.ubx.poo.game.Direction;
 import fr.ubx.poo.game.Position;
-import fr.ubx.poo.model.decor.Decor;
 import fr.ubx.poo.model.go.bombs.Bomb;
 import fr.ubx.poo.model.go.monsters.Monster;
 import fr.ubx.poo.view.sprite.Sprite;
@@ -14,7 +13,7 @@ import fr.ubx.poo.view.sprite.SpriteBomb;
 import fr.ubx.poo.view.sprite.SpriteFactory;
 import fr.ubx.poo.game.Game;
 import fr.ubx.poo.model.go.character.Player;
-import fr.ubx.poo.view.sprite.SpriteGameObject;
+import fr.ubx.poo.view.sprite.SpriteMonster;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -27,7 +26,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,23 +38,22 @@ public final class GameEngine {
     private final String windowTitle;
     private final Game game;
     private Player player;
-    private final Monster monster;
+    private List<Monster> monsters = new ArrayList<>();
     private List<Bomb> bombs = new ArrayList<>();
     private final List<Sprite> sprites = new ArrayList<>();
-    //private List<Monster> monsters = new ArrayList<>();//НЕ уверен
     private StatusBar statusBar;
     private Pane layer;
     private Input input;
     private Stage stage;
     private Sprite spritePlayer;
-    private Sprite spriteMonster;
-    private List<SpriteBomb> spritesBomb = new ArrayList<>();
+    private List<SpriteMonster> spritesMonsters = new ArrayList<>();
+    private List<SpriteBomb> spritesBombs = new ArrayList<>();
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
         this.game = game;
         this.player = game.getPlayer();
-        this.monster = game.getMonster();
+        this.monsters = game.getMonsters();
         this.bombs = game.getBombs();
         initialize(stage, game, 0);
         buildAndSetGameLoop();
@@ -87,10 +84,33 @@ public final class GameEngine {
         // Create decor sprites
         game.getWorld(level).forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
+       // System.out.println("level: " + level + " player: " + player.getLevel());
 
-        spriteMonster = SpriteFactory.createMonster(layer, monster);
-        if(level == 0 && !game.getBombs().isEmpty())
-            spritesBomb.set(0, (SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
+        if(spritesMonsters.size() == 0) {
+            for(int i = 0; i < monsters.size(); i++) {
+                spritesMonsters.add((SpriteMonster) SpriteFactory.createMonster(layer, monsters.get(i)));
+            }
+        }
+
+
+        if(level == player.getLevel()) {
+
+            for(int i = 0; i < monsters.size(); i++) {
+                if(monsters.get(i).getLevel() == player.getLevel()) {
+                    spritesMonsters.set(i, (SpriteMonster) SpriteFactory.createMonster(layer, monsters.get(i)));
+                }
+            }
+            for(int i = 0; i < bombs.size(); i++) {
+                if(bombs.get(i).getLevel() == player.getLevel()) {
+                    spritesBombs.set(i, (SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
+                }
+            }
+
+        }
+
+        //spriteMonster = SpriteFactory.createMonster(layer, monster);
+        //if(level == 0 && !game.getBombs().isEmpty())
+           // spritesBombs.set(0, (SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
 
 
     }
@@ -161,20 +181,22 @@ public final class GameEngine {
         if(game.getIsNewLevel()[0]){
             stage.close();
             //System.out.println(game.getNLevel());
-            initialize(stage, game, game.getNLevel());
+            //spritesMonsters.clear();
+            //spritesBombs.clear();
+            initialize(stage, game, game.getNNowLevel());
             Position p;
             if(game.getIsNewLevel()[1]) {
-                p = game.getWorld(game.getNLevel()).findDoorPrevOpened();
+                p = game.getWorld(game.getNNowLevel()).findDoorPrevOpened();
             }
             else {
-                p = game.getWorld(game.getNLevel()).findDoorNextOpened();
+                p = game.getWorld(game.getNNowLevel()).findDoorNextOpened();
             }
             player.setPosition(p);
             player.setDirection(S);
             game.setIsNewLevel(false, true);
-            System.out.println("Bombs: " + bombs.isEmpty());
-            System.out.println("Sprites: " + spritesBomb.isEmpty());
-            //spritesBomb.get(0).render();
+            //System.out.println("Bombs: " + bombs.isEmpty());
+            //System.out.println("Sprites: " + spritesBombs.isEmpty());
+            //spritesBombs.get(0).render();
         }
 
         player.update(now);
@@ -189,11 +211,22 @@ public final class GameEngine {
 
                 if(!bombs.get(i).update(now) || bombs.get(i).getLives() == 0){
                     bombs.remove(i);
-                    spritesBomb.get(i).remove();
-                    spritesBomb.remove(i);
+                    spritesBombs.get(i).remove();
+                    spritesBombs.remove(i);
                     player.changeBombNumber(1);
                 }
             }
+        }
+
+        for(int i = 0; i < monsters.size(); i++) {
+            monsters.get(i).update(now);
+            if(monsters.get(i).getLives() < 1){
+                System.out.println(monsters.get(i).getLives() + " " + monsters.get(i).getLevel() + " " + monsters.get(i).getPosition());
+                monsters.remove(i);
+                spritesMonsters.get(i).remove();
+                spritesMonsters.remove(i);
+            }
+
         }
 
 
@@ -211,74 +244,59 @@ public final class GameEngine {
     }
 
     private void render() {
-        if(game.getWorld(game.getNLevel()).getChangeMap()){
+        if(game.getWorld(game.getNNowLevel()).getChangeMap()){
             //System.out.println(sprites);
             sprites.forEach(Sprite::remove);
             sprites.removeAll(sprites);
-            game.getWorld(game.getNLevel()).forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+            game.getWorld(game.getNNowLevel()).forEach( (pos, d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
             //System.out.println(sprites);
-            game.getWorld(game.getNLevel()).setChangeMap(false);
+            game.getWorld(game.getNNowLevel()).setChangeMap(false);
         }
 
         if(!bombs.isEmpty()) {
-            if(spritesBomb.isEmpty()) {
-                /*try{
-                    //System.out.println("Bombs: " + bombs.isEmpty());
-                    //System.out.println("Sprites: " + spritesBomb.isEmpty());
-                    if(!bombs.isEmpty())
-                        spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
-                    if(!spritesBomb.isEmpty()) {
-                        System.out.println(spritesBomb.get(0) + " " +  spritesBomb.isEmpty());
-                        spritesBomb.get(0).render();
-                    }
-
-                }
-                catch (IndexOutOfBoundsException ex){
-                    System.err.println("!!!!!!");
-                }*/
-                spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
-                spritesBomb.get(0).render();
+            if(spritesBombs.isEmpty()) {
+                spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
+                spritesBombs.get(0).render();
 
             }
             else {
-                if(bombs.size() > spritesBomb.size()) {
-                    spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(spritesBomb.size())));
-                    spritesBomb.get(spritesBomb.size()-1).render();
+                if(bombs.size() > spritesBombs.size()) {
+                    spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(spritesBombs.size())));
+                    if(game.getNNowLevel() == player.getLevel() && !game.getBombs().isEmpty())
+                        spritesBombs.get(spritesBombs.size()-1).render();
                 }
                 else {
-                    for (int i = 0; i < spritesBomb.size(); i++) {
-                        spritesBomb.get(i).render();
+                    for (int i = 0; i < spritesBombs.size(); i++) {
+                        if(game.getNNowLevel() == player.getLevel() && !game.getBombs().isEmpty())
+                            spritesBombs.get(i).render();
                         //System.out.println(bombs.get(0).getPosition());
                     }
                 }
             }
         }
-        if(game.getNLevel() == 0 && !game.getBombs().isEmpty()) {
-            spritesBomb.get(0).render();
-        }
         /*if(!bombs.isEmpty()) {
             for(int i = 0; i < bombs.size(); i++) {
                 if(bombs.get(i) != null){
-                    if(spritesBomb.isEmpty()) {
-                        spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
+                    if(spritesBombs.isEmpty()) {
+                        spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
                     }
-                    else if(spritesBomb.get(i) != null) {
-                        spritesBomb.get(i).render();
+                    else if(spritesBombs.get(i) != null) {
+                        spritesBombs.get(i).render();
                     }
                     else {
-                        spritesBomb.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
+                        spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
                     }
                 }
                 else {
-                    spritesBomb.get(i).remove();
-                    spritesBomb.remove(i);
+                    spritesBombs.get(i).remove();
+                    spritesBombs.remove(i);
                 }
             }
         }
         else {
-            if(!spritesBomb.isEmpty()){
-                spritesBomb.get(0).remove();
-                spritesBomb.remove(0);
+            if(!spritesBombs.isEmpty()){
+                spritesBombs.get(0).remove();
+                spritesBombs.remove(0);
             }
         }*/
 
@@ -287,7 +305,14 @@ public final class GameEngine {
         sprites.forEach(Sprite::render);
         // last rendering to have player in the foreground
         spritePlayer.render();
-        spriteMonster.render();
+
+        for (int i = 0; i < spritesMonsters.size(); i++) {
+            if(monsters.get(i).getLevel() == player.getLevel()) {
+                spritesMonsters.get(i).render();
+            }
+
+        }
+        //spriteMonster.render();
 
     }
 

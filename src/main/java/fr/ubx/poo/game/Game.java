@@ -19,30 +19,46 @@ public class Game {
 
     private List<World> world = new ArrayList<>();
     private final Player player;
-    private Monster monster; //Cделать как список
+    //private Monster monster; //Cделать как список
     private List<Bomb> bombs = new ArrayList<>();
-    //private List<Monster> monsters = new ArrayList<>();
+    private List<Monster> monsters = new ArrayList<>();
     private final String worldPath;
     public int initPlayerLives;
     public int initLevels;
     public String prefixMondes;
     private boolean isNewLevel[] = {false, false};
-    private int nLevel;
+    private int nNowLevel;
 
     public Game(String worldPath) throws IOException {
         //world = new WorldStatic();
-        nLevel = 0;
+        nNowLevel = 0;
+        int nLevel = 0;
         this.worldPath = worldPath;
         loadConfig(worldPath);
         loadLevels(worldPath);
         Position positionPlayer = null;
-        Position positionMonster = null;
+        List<Position> positionsMonster = null;
 
         try {
-            positionMonster = world.get(nLevel).findMonsters();
-            monster = new Monster(this, positionMonster);
-            positionPlayer = world.get(nLevel).findPlayer();
-            player = new Player(this, positionPlayer);
+            for(; nLevel < world.size(); nLevel++) {
+                positionPlayer = world.get(nLevel).findPlayer(initLevels);
+                if(positionPlayer != null) {
+                    break;
+                }
+            }
+            player = new Player(this, positionPlayer, nLevel);
+
+            nLevel = 0;
+
+            for(; nLevel < world.size(); nLevel++) {
+                positionsMonster = world.get(nLevel).findMonsters(initLevels);
+                if(positionsMonster != null) {
+                    for(int i = 0; i < positionsMonster.size(); i++) {
+                        monsters.add(new Monster(this, positionsMonster.get(i), nLevel));
+                    }
+                }
+            }
+
         } catch (PositionNotFoundException e) {
             System.err.println("Position not found : " + e.getLocalizedMessage());
             throw new RuntimeException(e);
@@ -69,7 +85,7 @@ public class Game {
     private void loadLevels(String path) throws IOException {
         for(int i = 0; i < initLevels; i++){
             WorldCreatorFromFile wc = new WorldCreatorFromFile(path, prefixMondes, i+1);
-            world.add(new World(wc.mapEntities));
+            world.add(new World(wc.mapEntities, i));
         }
 
     }
@@ -82,8 +98,8 @@ public class Game {
         return this.player;
     }
 
-    public Monster getMonster() {
-        return this.monster;
+    public List<Monster> getMonsters() {
+        return monsters;
     }
 
     public List<Bomb> getBombs() {
@@ -103,22 +119,22 @@ public class Game {
         return isNewLevel;
     }
 
-    public void setNLevel(int nLevel) {
-        this.nLevel = nLevel;
+    public void setNNowLevel(int nNowLevel) {
+        this.nNowLevel = nNowLevel;
     }
 
-    public void incDecNLevel(int d) {
+    public void incDecNNowLevel(int d) {
         if(d < 0) {
-            if(nLevel > 0)
-                nLevel+=d;
+            if(nNowLevel > 0)
+                nNowLevel+=d;
         }
-        else if(nLevel < initLevels) {
-            nLevel+=d;
+        else if(nNowLevel < initLevels) {
+            nNowLevel+=d;
         }
     }
 
-    public int getNLevel() {
-        return nLevel;
+    public int getNNowLevel() {
+        return nNowLevel;
     }
 
 }

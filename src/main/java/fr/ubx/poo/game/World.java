@@ -5,11 +5,8 @@
 package fr.ubx.poo.game;
 
 import fr.ubx.poo.model.decor.Decor;
-import fr.ubx.poo.model.go.bombs.Bomb;
-import fr.ubx.poo.model.go.monsters.Monster;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class World {
@@ -17,18 +14,18 @@ public class World {
     private final WorldEntity[][] raw;
     public final Dimension dimension;
     private boolean changeMap;
+    private int level;
 
-    public World(WorldEntity[][] raw) {
+    public World(WorldEntity[][] raw, int level) {
         this.raw = raw;
-
-
+        this.level = level;
         dimension = new Dimension(raw.length, raw[0].length);
-        System.out.println(raw.length + " " + raw[0].length);
+        //System.out.println(raw.length + " " + raw[0].length);
         grid = WorldBuilder.build(raw, dimension);
         changeMap = false;
     }
 
-    public Position findPlayer() throws PositionNotFoundException {
+    public Position findPlayer(int maxLevel) throws PositionNotFoundException {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.Player) {
@@ -36,17 +33,27 @@ public class World {
                 }
             }
         }
+        if(level < maxLevel-1) {
+            return null;
+        }
         throw new PositionNotFoundException("Player");
     }
 
-    public Position findMonsters() throws PositionNotFoundException {
+    public List<Position> findMonsters(int maxLevel) throws PositionNotFoundException {
+        List<Position> positions = new ArrayList<>();
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.Monster) {
                     //System.out.println("Monster: " + y + " " + x);
-                    return new Position(x, y);
+                    positions.add(new Position(x, y));
                 }
             }
+        }
+        if(positions.size() > 0) {
+            return positions;
+        }
+        if(level < maxLevel-1) {
+            return null;
         }
         throw new PositionNotFoundException("Monster");
     }

@@ -5,6 +5,7 @@ import fr.ubx.poo.game.Game;
 import fr.ubx.poo.game.Position;
 import fr.ubx.poo.model.Movable;
 import fr.ubx.poo.model.go.GameObject;
+import fr.ubx.poo.model.go.character.Player;
 
 public class Monster extends GameObject implements Movable {
 
@@ -12,15 +13,33 @@ public class Monster extends GameObject implements Movable {
     Direction direction;
     private boolean moveRequested = false;
     private int lives = 1;
-    private boolean canGoToNewLevel = false;
+    private boolean canGoToSpecialObject = false;
+    private int level;
+    private Player player;
 
-    public Monster(Game game, Position position) {
-        super(game, position, 2);
+    public Monster(Game game, Position position, int level) {
+        super(game, position, 1);
         this.direction = Direction.S;
+        this.level = level;
+        player = game.getPlayer();
+        //System.out.println(player);
     }
 
     public int getLives() {
         return lives;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void changeLives(int n) {
+        System.out.println("!");
+        this.lives += n;
     }
 
     public Direction getDirection() {
@@ -53,9 +72,19 @@ public class Monster extends GameObject implements Movable {
             }
         }
         moveRequested = false;
+        if(player.getLevel() == level) {
+           damage(1);
+        }
     }
 
     public boolean isAlive() {
         return alive;
     }
+
+    public void damage(int j) {
+        Position center = getPosition();
+        if(player.getPosition().x == center.x && player.getPosition().y == center.y && player.getCanBeDamaged())
+            player.changeLives(-j);
+    }
 }
+

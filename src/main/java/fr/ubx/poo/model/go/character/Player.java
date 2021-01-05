@@ -14,7 +14,6 @@ import fr.ubx.poo.model.decor.DoorNextOpened;
 import fr.ubx.poo.model.go.GameObject;
 import fr.ubx.poo.game.Game;
 import fr.ubx.poo.model.go.bombs.Bomb;
-import fr.ubx.poo.view.sprite.SpriteFactory;
 
 public class Player extends GameObject implements Movable {
 
@@ -22,6 +21,7 @@ public class Player extends GameObject implements Movable {
     private boolean canBeDamaged = true;
     Direction direction;
     private boolean moveRequested = false;
+    private int level;
     private int lives = 3;
     private int bombs = 10;
     private int range = 1;
@@ -29,10 +29,15 @@ public class Player extends GameObject implements Movable {
     private boolean canGoToNewLevel = true;
     private boolean winner;
 
-    public Player(Game game, Position position) {
+    public Player(Game game, Position position, int level) {
         super(game, position, 3);
         this.direction = Direction.S;
         this.lives = game.getInitPlayerLives();
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     public int getLives() {
@@ -65,6 +70,20 @@ public class Player extends GameObject implements Movable {
 
     public void setAliveFalse() {
         this.alive = false;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void incDecNowLevel(int d) {
+        if(d < 0) {
+            if(level > 0)
+                level+=d;
+        }
+        else if(level < game.initLevels) {
+            level+=d;
+        }
     }
 
     public void changeBombNumber(int n) {
@@ -107,10 +126,10 @@ public class Player extends GameObject implements Movable {
     public void placeBomb() {
         //Position nextPos = direction.nextPosition(getPosition());
 
-        if(game.getWorld(game.getNLevel()).isEmpty(getPosition()) && bombs > 0) {
+        if(game.getWorld(game.getNNowLevel()).isEmpty(getPosition()) && bombs > 0) {
             //System.out.println("game.getWorld()");
             //game.getWorld().setBombs(nextPos);
-            Bomb bomb = new Bomb(game, getPosition(), range, 0);
+            Bomb bomb = new Bomb(game, getPosition(), range, level);
             game.setBomb(bomb);
             bomb = null;
             changeBombNumber(-1);
@@ -122,14 +141,14 @@ public class Player extends GameObject implements Movable {
     public void openDoor() {
         Position nextPos = direction.nextPosition(getPosition());
 
-        if(!game.getWorld(game.getNLevel()).isEmpty(nextPos)) {
+        if(!game.getWorld(game.getNNowLevel()).isEmpty(nextPos)) {
             //System.out.println("game.getWorld().get(nextPos)" + game.getWorld().get(nextPos));
             //System.out.println(game.getWorld().get(nextPos).equals(new DoorNextClosed()));
-            if(game.getWorld(game.getNLevel()).get(nextPos).equals(new DoorNextClosed()) && keys > 0){
+            if(game.getWorld(game.getNNowLevel()).get(nextPos).equals(new DoorNextClosed()) && keys > 0){
                 //System.out.println("!");
                 keys--;
-                game.getWorld(game.getNLevel()).set(nextPos, new DoorNextOpened());
-                game.getWorld(game.getNLevel()).setChangeMap(true);
+                game.getWorld(game.getNNowLevel()).set(nextPos, new DoorNextOpened());
+                game.getWorld(game.getNNowLevel()).setChangeMap(true);
             }
         }
 
@@ -141,8 +160,8 @@ public class Player extends GameObject implements Movable {
         //System.out.println(game.getNLevel());
         //System.out.println(game.getWorld().getRaw(nextPos));
 
-        if(nextPos.inside(game.getWorld(game.getNLevel()).dimension)) {
-            Decor decor = game.getWorld(game.getNLevel()).get(nextPos);
+        if(nextPos.inside(game.getWorld(game.getNNowLevel()).dimension)) {
+            Decor decor = game.getWorld(game.getNNowLevel()).get(nextPos);
             //System.out.println(direction + " " + nextPos + " " + decor);
             if(decor == null) {
                 return true;
@@ -151,18 +170,20 @@ public class Player extends GameObject implements Movable {
                 if(decor.getCollectables()) {
                     decor.take(this);
                     //System.out.println(game.getWorld().values());
-                    game.getWorld(game.getNLevel()).clear(nextPos);
-                    game.getWorld(game.getNLevel()).setChangeMap(true);
+                    game.getWorld(game.getNNowLevel()).clear(nextPos);
+                    game.getWorld(game.getNNowLevel()).setChangeMap(true);
 
                 }
                 else if(decor.getWayNextLevel()) {
                     if(decor instanceof DoorNextOpened) {
-                        game.incDecNLevel(1);
+                        game.incDecNNowLevel(1);
+                        incDecNowLevel(1);
                         game.setIsNewLevel(true, true);
                         //System.out.println(game.getNLevel() + "t");
                     }
                     else {
-                        game.incDecNLevel(-1);
+                        game.incDecNNowLevel(-1);
+                        incDecNowLevel(-1);
                         game.setIsNewLevel(true, false);
                         //System.out.println(game.getNLevel() + "f");
                     }
@@ -171,11 +192,11 @@ public class Player extends GameObject implements Movable {
             }
             else if(decor.getMovability()) {
                 Position nextNextPos = direction.nextPosition(nextPos);
-                if(game.getWorld(game.getNLevel()).isEmpty(nextNextPos) && nextNextPos.inside(game.getWorld(game.getNLevel()).dimension)){
+                if(game.getWorld(game.getNNowLevel()).isEmpty(nextNextPos) && nextNextPos.inside(game.getWorld(game.getNNowLevel()).dimension)){
                     //System.out.println("Box");
-                    game.getWorld(game.getNLevel()).set(nextNextPos, new Box());
-                    game.getWorld(game.getNLevel()).clear(nextPos);
-                    game.getWorld(game.getNLevel()).setChangeMap(true);
+                    game.getWorld(game.getNNowLevel()).set(nextNextPos, new Box());
+                    game.getWorld(game.getNNowLevel()).clear(nextPos);
+                    game.getWorld(game.getNNowLevel()).setChangeMap(true);
                     return true;
                 }
             }

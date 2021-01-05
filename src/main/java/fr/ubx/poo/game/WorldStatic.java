@@ -24,6 +24,6 @@ public class WorldStatic extends World {
                     {Empty, BombNumberDec, Empty, Empty, BombRangeDec, Empty, Empty, Empty, BombNumberInc, Empty, Empty, Princess}
             };
     public WorldStatic() {
-        super(mapEntities);
+        super(mapEntities, 0);
     }
 }
