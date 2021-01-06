@@ -15,14 +15,12 @@ import static java.lang.Thread.sleep;
 public class Bomb extends GameObject {
 
     private int range;
-    private int level;
-    private boolean isNew = true;
-    private int lives = 1;
-    private List<Bomb> bombs = game.getBombs();
-    private Player player = game.getPlayer();
-    private List<Monster> monsters = game.getMonsters();
-
-   // private List<Monster> monsters = game.getMonster();
+    private int nLives;
+    private boolean isNew;
+    private int damage;
+    private List<Bomb> bombs;
+    private Player player;
+    private List<Monster> monsters;
 
     public int getRange() {
         return range;
@@ -32,21 +30,14 @@ public class Bomb extends GameObject {
         this.range = range;
     }
 
-    public int getLevel() {
-        return level;
+    public int getNLives() {
+        return nLives;
     }
 
-    public void setLevel(int level) {
-        this.level = level;
+    public void setNLives(int nLives) {
+        this.nLives = nLives;
     }
 
-    public int getLives() {
-        return lives;
-    }
-
-    public void setLives(int lives) {
-        this.lives = lives;
-    }
 
     public boolean getIsNew() {
         return isNew;
@@ -58,121 +49,137 @@ public class Bomb extends GameObject {
 
 
     public Bomb(Game game, Position position, int range, int level) {
-        super(game, position, 4);
+        super(game, position, 4, level);
         this.range = range;
-        this.level = level;
+
+        nLives = 1;
+        damage = 1;
+        isNew = true;
+        player = game.getPlayer();
+        monsters = game.getMonsters();
+        bombs = game.getBombs();
     }
 
     public boolean update(long now) {
 
         if(getCl() > -1) {
-            if(now - getTime() >= 1000000000) {
-                //System.out.println(now - time);
+            if(now - getTime() >= 800000000) {
                 setTime(now);
-                //System.out.println(cl);
-                setCl(getCl()-1);;
+                setCl(getCl()-1);
             }
             return true;
         }
-        damage(1);
+        doDamage();
         return false;
     }
 
-    public void damage(int j) {
+    public void doDamage() {
         Position center = getPosition();
-        if(player.getLevel() == level) {
+        if(player.getLevel() == getLevel()) {
             if(player.getPosition().x == center.x && player.getPosition().y == center.y && player.getCanBeDamaged())
-                player.changeLives(-j);
+                player.changeNLives(-damage);
         }
-        for(int i = 0; i < monsters.size(); i++) {
-            if(monsters.get(i).getLevel() == level) {
-                //System.out.println("Нашёл");
+        /*for(int i = 0; i < monsters.size(); i++) {
+            if(monsters.get(i).getLevel() == getLevel()) {
                 if(monsters.get(i).getPosition().x == center.x && monsters.get(i).getPosition().y == center.y)
-                    monsters.get(i).changeLives(-j);
+                    monsters.get(i).changeLives(-damage);
+            }
+        }*/
+        for(Monster m : monsters) {
+            if(m.getLevel() == getLevel()) {
+                if(m.getPosition().x == center.x && m.getPosition().y == center.y)
+                    m.changeLives(-damage);
             }
         }
-        for(int i = j; i < bombs.size(); i++){
-            if(bombs.get(i).getLevel() == level) {
+        /*for(int i = 1; i < bombs.size(); i++){
+            if(bombs.get(i).getLevel() == getLevel()) {
                 if(bombs.get(i).getPosition().x == center.x && bombs.get(i).getPosition().y == center.y) {
-                    if(bombs.get(i).getLives() != 0) {
-                        bombs.get(i).setLives(0);
+                    if(bombs.get(i).getNLives() > 0) {
+                        bombs.get(i).setNLives(0);
+                    }
+                }
+            }
+        }*/
+        for(Bomb b : bombs){
+            if(b.getLevel() == getLevel()) {
+                if(b.getPosition().x == center.x && b.getPosition().y == center.y) {
+                    if(b.getNLives() > 0) {
+                        b.setNLives(0);
                     }
                 }
             }
         }
 
-        //System.out.println(getPosition());
-        //System.out.println("Player: " + player.getPosition());
-        damageDirection(Direction.N, j);
-        damageDirection(Direction.S, j);
-        damageDirection(Direction.W, j);
-        damageDirection(Direction.E, j);
+        damageDirection(Direction.N);
+        damageDirection(Direction.S);
+        damageDirection(Direction.W);
+        damageDirection(Direction.E);
     }
 
 
-    public void damageDirection(Direction direction, int j) {
+    public void damageDirection(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
 
         for(int i = 0; i < range; i++){
-            Decor decor = game.getWorld(game.getNNowLevel()).get(nextPos);
-            //System.out.println(nextPos + " " + direction);
+            Decor decor = game.getWorld(getLevel()).get(nextPos);
             if(decor != null) {
                 if(decor.getDestructible()) {
-                    game.getWorld(game.getNNowLevel()).clear(nextPos);
-                    game.getWorld(game.getNNowLevel()).setChangeMap(true);
-                    if(decor.getMovability()){
-                        break;
-                    }
+                    game.getWorld(getLevel()).clear(nextPos);
+                    game.getWorld(getLevel()).setChangeMap(true);
                 }
-                else {
-                    if(!decor.getCollectables()){
-                        break;
-                    }
-                }/*
-                if(decor.getMovability()) {
-                    game.getWorld().clear(nextPos);
-                    game.getWorld().setChangeMap(true);
-                    break;
-                }
-                else if(decor.getCollectables()) {
-                    if(decor.getDestructible()) {
-                        game.getWorld().clear(nextPos);
-                        game.getWorld().setChangeMap(true);
-                    }
-                }
-                else if(!decor.getPassability()) {
-                    break;
-                }*/
+                break;
             }
 
-            if(player.getLevel() == level) {
-                if(player.getPosition().x == nextPos.x && player.getPosition().y == nextPos.y && player.getCanBeDamaged()) {
-                    //System.out.println("Player: " + player.getPosition());
-                    player.changeLives(-j);
+            if(player.getLevel() == getLevel()) {
+                Position playerPos = player.getPosition();
+                if(playerPos.x == nextPos.x && playerPos.y == nextPos.y && player.getCanBeDamaged()) {
+                    player.changeNLives(-damage);
                 }
             }
 
+            /*for(int k = 0; k < monsters.size(); k++) {
+                if(monsters.get(k).getLevel() == getLevel()) {
+                    if(monsters.get(k).getPosition().x == nextPos.x && monsters.get(k).getPosition().y == nextPos.y) {
+                        monsters.get(k).changeLives(-damage);
+                        monsters.get(k).changeLives(-damage);
+                    }
 
-            for(int k = 0; k < monsters.size(); k++) {
-                if(monsters.get(k).getLevel() == level) {
-                    if(monsters.get(k).getPosition().x == nextPos.x && monsters.get(k).getPosition().y == nextPos.y)
-                        monsters.get(k).changeLives(-j);
+                }
+            }*/
+            for(Monster m : monsters) {
+                if(m.getLevel() == getLevel()) {
+                    if(m.getPosition().x == nextPos.x && m.getPosition().y == nextPos.y) {
+                        m.changeLives(-damage);
+                    }
+
                 }
             }
 
-            for(int k = j; k < bombs.size(); k++){
-                if(bombs.get(k).getLevel() == level) {
+            /*for(int k = 1; k < bombs.size(); k++){
+                if(bombs.get(k).getLevel() == getLevel()) {
                     if(bombs.get(k).getPosition().x == nextPos.x && bombs.get(k).getPosition().y == nextPos.y) {
-                        if(bombs.get(k).getLives() != 0) {
-                            bombs.get(k).damage(k);
-                            bombs.get(k).setLives(0);
+                        if(bombs.get(k).getNLives() > 0) {
+                            bombs.get(k).doDamage();
                         }
-
+                    }
+                }
+            }*/
+            for(Bomb b : bombs){
+                if(b.getLevel() == getLevel()) {
+                    if(b.getPosition().x == nextPos.x && b.getPosition().y == nextPos.y) {
+                        if(b.getNLives() > 0) {
+                            b.doDamage();
+                        }
                     }
                 }
             }
 
             nextPos = direction.nextPosition(nextPos);
         }
+    }
+
+    public String toString() {
+        return "Bomb, position: " + getPosition() + ", cl: " + getCl() + ", range: " + getRange()
+                + ", level: " + getLevel() +", nLives: " + getNLives() + ", isNew: " + getIsNew() + ", damage: 1";
     }
 }

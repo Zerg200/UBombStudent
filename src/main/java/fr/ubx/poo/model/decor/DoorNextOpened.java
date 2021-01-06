@@ -3,10 +3,7 @@ package fr.ubx.poo.model.decor;
 public class DoorNextOpened extends Decor{
     public DoorNextOpened() {
         super(true, false, false, false, true);
-    }
-
-    public void setIsNext() {
-        super.setIsNext(true);
+        super.setIsNext(1);
     }
 
     public String toString() {

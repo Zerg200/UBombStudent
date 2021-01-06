@@ -81,10 +81,10 @@ public class StatusBar {
 
     public void update(Game game) {
         updateLevel(game.getNNowLevel()+1);
-        liveValue.setText(String.valueOf(game.getPlayer().getLives()));
+        liveValue.setText(String.valueOf(game.getPlayer().getNLives()));
         rangeValue.setText(String.valueOf(game.getPlayer().getRange()));
-        bombsValue.setText(String.valueOf(game.getPlayer().getBombs()));
-        keyValue.setText(String.valueOf(game.getPlayer().getKeys()));
+        bombsValue.setText(String.valueOf(game.getPlayer().getNBombs()));
+        keyValue.setText(String.valueOf(game.getPlayer().getNKeys()));
     }
 
 }

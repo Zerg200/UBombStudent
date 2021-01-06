@@ -18,7 +18,7 @@ public class Decor extends Entity {
     private boolean movability;
     private boolean destructible;
     private boolean wayNextLevel;
-    private boolean isNext;
+    private int isNext;
 
     public Decor(boolean passability, boolean collectables, boolean movability, boolean destructible, boolean wayNextLevel) {
         this.passability = passability;
@@ -26,6 +26,7 @@ public class Decor extends Entity {
         this.movability = movability;
         this.destructible = destructible;
         this.wayNextLevel = wayNextLevel;
+        isNext = 0;
     }
 
     public boolean getPassability() {
@@ -48,26 +49,14 @@ public class Decor extends Entity {
         return wayNextLevel;
     }
 
-    public boolean getIsNext() {
+    public int getIsNext() {
         return isNext;
     }
-    public void setIsNext(boolean isNext) {
+    public void setIsNext(int isNext) {
         this.isNext = isNext;
     }
 
     public void take(Player player) {
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Decor decor = (Decor) o;
-        return passability == decor.passability && collectables == decor.collectables && movability == decor.movability && destructible == decor.destructible;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(passability, collectables, movability, destructible);
-    }
 }

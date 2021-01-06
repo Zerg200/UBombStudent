@@ -14,8 +14,9 @@ import fr.ubx.poo.model.Entity;
 public abstract class GameObject extends Entity {
     protected final Game game;
     private Position position;
-    private long time = 0;
+    private long time;
     private int cl;
+    private int level;
 
 
     public Position getPosition() {
@@ -41,9 +42,30 @@ public abstract class GameObject extends Entity {
         return time;
     }
 
-    public GameObject(Game game, Position position, int cl) {
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void incDecNowLevel(int d) {
+        if(d < 0) {
+            if(level > 0)
+                level+=d;
+        }
+        else if(level < game.getInitLevels()) {
+            level+=d;
+        }
+    }
+
+    public GameObject(Game game, Position position, int cl, int level) {
         this.game = game;
         this.position = position;
         this.cl = cl;
+        time = 0;
+        this.level = level;
     }
+
 }

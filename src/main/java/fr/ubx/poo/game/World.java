@@ -20,7 +20,6 @@ public class World {
         this.raw = raw;
         this.level = level;
         dimension = new Dimension(raw.length, raw[0].length);
-        //System.out.println(raw.length + " " + raw[0].length);
         grid = WorldBuilder.build(raw, dimension);
         changeMap = false;
     }
@@ -44,7 +43,6 @@ public class World {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.Monster) {
-                    //System.out.println("Monster: " + y + " " + x);
                     positions.add(new Position(x, y));
                 }
             }
@@ -62,7 +60,6 @@ public class World {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.DoorPrevOpened) {
-                    //System.out.println("DoorPrevOpened: " + y + " " + x);
                     return new Position(x, y+1);
                 }
             }
@@ -74,7 +71,6 @@ public class World {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.DoorNextClosed) {
-                    //System.out.println("DoorNextOpened: " + y + " " + x);
                     return new Position(x, y+1);
                 }
             }
@@ -87,14 +83,9 @@ public class World {
         return grid.get(position);
     }
 
-    public WorldEntity getRaw(Position position) {
-        return raw[position.y][position.x];
-    }
-
     public void set(Position position, Decor decor) {
         grid.put(position, decor);
     }
-
 
     public void clear(Position position) {
         grid.remove(position);

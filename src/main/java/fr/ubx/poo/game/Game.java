@@ -8,7 +8,6 @@ package fr.ubx.poo.game;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 import fr.ubx.poo.model.go.bombs.Bomb;
@@ -19,14 +18,13 @@ public class Game {
 
     private List<World> world = new ArrayList<>();
     private final Player player;
-    //private Monster monster; //Cделать как список
     private List<Bomb> bombs = new ArrayList<>();
     private List<Monster> monsters = new ArrayList<>();
     private final String worldPath;
     public int initPlayerLives;
-    public int initLevels;
+    private int initLevels;
     public String prefixMondes;
-    private boolean isNewLevel[] = {false, false};
+    private boolean[] isNewLevel;
     private int nNowLevel;
 
     public Game(String worldPath) throws IOException {
@@ -34,10 +32,11 @@ public class Game {
         nNowLevel = 0;
         int nLevel = 0;
         this.worldPath = worldPath;
+        isNewLevel = new boolean[]{false, false};
         loadConfig(worldPath);
         loadLevels(worldPath);
         Position positionPlayer = null;
-        List<Position> positionsMonster = null;
+        List<Position> positionsMonster;
 
         try {
             for(; nLevel < world.size(); nLevel++) {
@@ -53,8 +52,8 @@ public class Game {
             for(; nLevel < world.size(); nLevel++) {
                 positionsMonster = world.get(nLevel).findMonsters(initLevels);
                 if(positionsMonster != null) {
-                    for(int i = 0; i < positionsMonster.size(); i++) {
-                        monsters.add(new Monster(this, positionsMonster.get(i), nLevel));
+                    for(Position p : positionsMonster) {
+                        monsters.add(new Monster(this, p, nLevel));
                     }
                 }
             }
@@ -117,6 +116,10 @@ public class Game {
 
     public boolean[] getIsNewLevel() {
         return isNewLevel;
+    }
+
+    public int getInitLevels() {
+        return initLevels;
     }
 
     public void setNNowLevel(int nNowLevel) {

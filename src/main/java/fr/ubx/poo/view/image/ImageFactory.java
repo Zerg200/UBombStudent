@@ -63,7 +63,7 @@ public final class ImageFactory {
         return get(digits[i]);
     }
 
-    public Image getNBomb(int i) {
+    public Image getNImageBomb(int i) {
         if (i < 0 || i > 9)
             throw new IllegalArgumentException();
         return get(bomb[i]);

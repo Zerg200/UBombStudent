@@ -16,7 +16,7 @@ public class WorldCreatorFromFile {
 
 
     public void getXYFromFile(BufferedReader bRead) throws IOException {
-        int j = 0;
+        int j;
         int i = bRead.read();
         while(i != -1) {
             char dataChar = (char) i;
@@ -33,15 +33,12 @@ public class WorldCreatorFromFile {
             if(y == 0){
                 x++;
             }
-            //System.out.println(i + " " + dataChar + " x:" + x + " y:" + y);
             j = i;
             i = bRead.read();
             if(j != 10 && i == -1){
                 y++;
             }
         }
-        //System.out.println(x + " " + y);
-
     }
 
     public void getMapFromFile(BufferedReader bRead) throws IOException {
@@ -52,23 +49,22 @@ public class WorldCreatorFromFile {
 
         int i = bRead.read();
         while(i != -1) {
-            if(yi >= y){
-                yi = 0;
-                //System.out.println(" !!!");
-                xi++;
-            }
+
             char dataChar = (char) i;
             owe = WorldEntity.fromCode(dataChar);
-            if(!owe.isEmpty()){
-                mapEntities[xi][yi] = WorldEntity.fromCode(dataChar).get();
-                //System.out.print(" " + mapEntities[xi][yi]);
+            if(owe.isPresent()){
+                mapEntities[yi][xi] = owe.get();
+                xi++;
+            }
+            else {
+                if(xi >= x) {
+                    xi = 0;
+                }
                 yi++;
             }
 
             i = bRead.read();
         }
-        //System.out.println(x + " " + y);
-
     }
 
     public WorldCreatorFromFile(String path, String prefixMondes, int index) throws IOException {
@@ -79,21 +75,8 @@ public class WorldCreatorFromFile {
         fIn.getChannel().position(0);
         bRead = new BufferedReader(new InputStreamReader(fIn));
 
-        if(y < x){
-            int tmp = x;
-            x = y;
-            y = tmp;
-        }
-        mapEntities = new WorldEntity[x][y];
+        mapEntities = new WorldEntity[y][x];
         getMapFromFile(bRead);
-
-        /*System.out.println(mapEntities[0].length);
-        for(int i = 0; i <mapEntities.length; i++) {
-            for(int j = 0; j < mapEntities[0].length; j++) {
-                System.out.print("" + mapEntities[i][j]);
-            }
-            System.out.println("");
-        }*/
 
         bRead.close();
     }

@@ -9,20 +9,9 @@ import javafx.scene.layout.Pane;
 public class SpriteMonster extends SpriteGameObject{
     private final ColorAdjust effect = new ColorAdjust();
 
-    /*private Monster linkToObject = null;
-
-    public void setlinkToObject(Monster linkToObject) {
-        this.linkToObject = linkToObject;
-    }
-
-    public Monster getlinkToObject() {
-        return linkToObject;
-    }*/
-
     public SpriteMonster (Pane layer, Monster monster) {
         super(layer, null, monster);
         updateImage();
-        //linkToObject = monster;
     }
     @Override
     public void updateImage() {

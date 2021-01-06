@@ -8,8 +8,8 @@ public class BombNumberDec extends Decor {
     }
 
     public void take(Player player) {
-        if(player.getBombs() > 1)
-            player.changeBombNumber(-1);
+        if(player.getNBombs() > 1)
+            player.changeNBombs(-1);
     }
 
     public String toString() {
