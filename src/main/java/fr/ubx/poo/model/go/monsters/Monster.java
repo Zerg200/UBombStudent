@@ -65,7 +65,10 @@ public class Monster extends GameObject implements Movable {
 
     public void update(long now) {
         if(getCl() > -1) {
-            if(now - getTime() >= (800000000 - (long) getLevel() * 100000000)) {
+            long t =  800000000 - (long) getLevel() * 100000000;
+            if(t < 300000000)
+                t = 300000000;
+            if(now - getTime() >= t) {
                 setTime(now);
                 setCl(getCl()-1);
                 if(getCl() == 0) {

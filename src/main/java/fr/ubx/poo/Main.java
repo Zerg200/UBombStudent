@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2020. Laurent Réveillère
+ * @autor Groupe 28: Zhukov Alexey, Ibrahim Youssouf Mahamat
  */
 
 package fr.ubx.poo;

@@ -30,10 +30,12 @@ public class Player extends GameObject implements Movable {
     private int keys;
     private boolean winner;
     private List<Monster> monsters;
+    private List<Bomb> bombs;
 
     public Player(Game game, Position position, int level) {
         super(game, position, 1, level);
         monsters = game.getMonsters();
+        bombs = game.getBombs();
         this.direction = Direction.S;
         this.nLives = game.getInitPlayerLives();
         alive = true;
@@ -114,10 +116,23 @@ public class Player extends GameObject implements Movable {
     }
 
     public void placeBomb() {
-        if(game.getWorld(game.getNNowLevel()).isEmpty(getPosition()) && nBombs > 0) {
-            game.setBomb(new Bomb(game, getPosition(), range, getLevel()));
-            changeNBombs(-1);
+
+        //if(game.getWorld(game.getNNowLevel()).isEmpty(getPosition()) && nBombs > 0) {
+        if(nBombs > 0) {
+            boolean can = true;
+
+            for(Bomb b : bombs) {
+                if(b.getPosition().equals(getPosition())){
+                    can = false;
+                }
+            }
+
+            if(can) {
+                game.setBomb(new Bomb(game, getPosition(), range, getLevel()));
+                changeNBombs(-1);
+            }
         }
+
     }
 
     public void openDoor() {
@@ -168,16 +183,16 @@ public class Player extends GameObject implements Movable {
             }
             else if(decor.getMovability()) {
                 Position nextNextPos = direction.nextPosition(nextPos);
-                boolean canMove = true;
+                boolean canMoveBox = true;
 
                 if(game.getWorld(game.getNNowLevel()).isEmpty(nextNextPos) && nextNextPos.inside(game.getWorld(game.getNNowLevel()).dimension)){
                     for(Monster m : monsters) {
                         if (m.getLevel() == getLevel()) {
-                            if (m.getPosition().x == nextNextPos.x && m.getPosition().y == nextNextPos.y)
-                                canMove = false;
+                            if (m.getPosition().equals(nextNextPos))
+                                canMoveBox = false;
                         }
                     }
-                    if(canMove) {
+                    if(canMoveBox) {
                         game.getWorld(game.getNNowLevel()).set(nextNextPos, new Box());
                         game.getWorld(game.getNNowLevel()).clear(nextPos);
                         game.getWorld(game.getNNowLevel()).setChangeMap(true);
