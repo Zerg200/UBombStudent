@@ -7,6 +7,10 @@ public class Princess extends Decor{
         super(true, true, false, false, false);
     }
 
+    /**
+     * Method for picking up a princess.
+     * @param player player
+     */
     public void take(Player player) {
         player.setWinnerTrue();
     }

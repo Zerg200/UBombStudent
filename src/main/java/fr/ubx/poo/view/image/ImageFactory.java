@@ -23,7 +23,6 @@ public final class ImageFactory {
     };
 
     private final ImageResource[] bomb = new ImageResource[]{
-            // Direction { N, E, S, W }
            EXPLOSION, BOMB_1, BOMB_2, BOMB_3, BOMB_4,
     };
 
@@ -63,8 +62,12 @@ public final class ImageFactory {
         return get(digits[i]);
     }
 
+    /**
+     * Returns the sprite of bomb at the index
+     * @param i sprite index
+     */
     public Image getNImageBomb(int i) {
-        if (i < 0 || i > 9)
+        if (i < 0 || i > 4)
             throw new IllegalArgumentException();
         return get(bomb[i]);
     }

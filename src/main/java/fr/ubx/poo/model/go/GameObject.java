@@ -25,10 +25,10 @@ public abstract class GameObject extends Entity {
     private int level;
 
     /**Game object constructor
-     * @param game - current game
-     * @param position - object's current position
-     * @param cl - the required number of operations to perform an action
-     * @param level - the current level where the object is located.
+     * @param game current game
+     * @param position object's current position
+     * @param cl the required number of operations to perform an action
+     * @param level the current level where the object is located.
      */
     public GameObject(Game game, Position position, int cl, int level) {
         this.game = game;
@@ -46,28 +46,28 @@ public abstract class GameObject extends Entity {
     }
 
     /**Method for setting the value of {@link GameObject#position}
-     * @param position - the position of the object
+     * @param position the position of the object
      */
     public void setPosition(Position position) {
         this.position = position;
     }
 
     /**Method for getting the field value of {@link GameObject#cl}
-     * @return returns the value of the current operation
+     * @return returns the indec of the current operation
      */
     public int getCl() {
         return cl;
     }
 
     /**Method for setting the value of {@link GameObject#cl}
-     * @param cl  - the value of the current operation
+     * @param cl the index of the current operation
      */
     public void setCl(int cl) {
         this.cl = cl;
     }
 
     /**Method for getting the field value of {@link GameObject#time}
-     * initial value = 0
+     * - initial value = 0
      * @return returns the current value of the game time at which the action was performed
      */
     public long getTime() {
@@ -75,7 +75,7 @@ public abstract class GameObject extends Entity {
     }
 
     /**Method for setting the value of {@link GameObject#time}
-     * @param now  - the value of the current game time
+     * @param now the value of the current game time
      */
     public void setTime(long now) {
         this.time = now;
@@ -89,23 +89,25 @@ public abstract class GameObject extends Entity {
     }
 
     /**Method for setting the value of {@link GameObject#level}
-     * @param level - the value of the game level
+     * @param level the value of the game level
      */
     public void setLevel(int level) {
         this.level = level;
     }
 
     /**Method for change the field value of {@link GameObject#level}
-     * @param d - the value to increase or decrease the level value
+     * @param d the value to increase or decrease the level value
      */
     public void incDecNowLevel(int d) {
         if(d < 0) {
-            if(level > 0)
+            if(level > 0) {
                 level+=d;
+            }
         }
-        else if(level < game.getInitLevels()) {
-            level+=d;
+        else {
+            if(level < game.getInitLevels()) {
+                level+=d;
+            }
         }
     }
-
 }

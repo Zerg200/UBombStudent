@@ -13,7 +13,9 @@ public class World {
     private final Map<Position, Decor> grid;
     private final WorldEntity[][] raw;
     public final Dimension dimension;
+    /** Signal that the map of the world has changed */
     private boolean changeMap;
+    /** The level number of this world */
     private int level;
 
     public World(WorldEntity[][] raw, int level) {
@@ -24,16 +26,13 @@ public class World {
         changeMap = false;
     }
 
-    public Position findPlayer(int maxLevel) throws PositionNotFoundException {
+    public Position findPlayer() throws PositionNotFoundException {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.Player) {
                     return new Position(x, y);
                 }
             }
-        }
-        if(level < maxLevel-1) {
-            return null;
         }
         throw new PositionNotFoundException("Player");
     }
@@ -60,6 +59,7 @@ public class World {
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.DoorPrevOpened) {
+                    //y+1, lets spawn in front of the door
                     return new Position(x, y+1);
                 }
             }
@@ -68,16 +68,19 @@ public class World {
     }
 
     public Position findDoorNextOpened(){
+        //Since a closed door and an open door are formed in the same place,
+        // there is an opportunity to use the coordinates of a closed door,
+        // since an open door is not created in raw
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.DoorNextClosed) {
+                    //y+1, lets spawn in front of the door
                     return new Position(x, y+1);
                 }
             }
         }
         return null;
     }
-
 
     public Decor get(Position position) {
         return grid.get(position);
@@ -97,10 +100,6 @@ public class World {
 
     public Collection<Decor> values() {
         return grid.values();
-    }
-
-    public boolean isInside(Position position) {
-        return true; // to update
     }
 
     public boolean isEmpty(Position position) {

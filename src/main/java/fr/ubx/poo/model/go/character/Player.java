@@ -24,7 +24,9 @@ public class Player extends GameObject implements Movable {
     private boolean canBeDamaged;
     Direction direction;
     private boolean moveRequested = false;
+    /** The number of lives */
     private int nLives;
+    /** The number of bombs */
     private int nBombs;
     private int range;
     private int keys;
@@ -32,6 +34,11 @@ public class Player extends GameObject implements Movable {
     private List<Monster> monsters;
     private List<Bomb> bombs;
 
+    /**Player constructor
+     * @param game current game
+     * @param position object's current position
+     * @param level the current level where the object is located
+     */
     public Player(Game game, Position position, int level) {
         super(game, position, 1, level);
         monsters = game.getMonsters();
@@ -80,14 +87,18 @@ public class Player extends GameObject implements Movable {
 
     public void changeNBombs(int n) {
         nBombs += n;
-        if(nBombs < 0)
+
+        if(nBombs < 0) {
             nBombs = 0;
+        }
     }
 
     public void changeRange(int n) {
         this.range += n;
-        if(this.range < 1)
+
+        if(this.range < 1) {
             this.range = 1;
+        }
     }
 
     public void increaseKey() {
@@ -95,8 +106,9 @@ public class Player extends GameObject implements Movable {
     }
 
     public void changeNLives(int n) {
-        if(n < 0)
+        if(n < 0) {
             setCanBeDamaged(false);
+        }
         this.nLives += n;
     }
 
@@ -115,15 +127,17 @@ public class Player extends GameObject implements Movable {
         moveRequested = true;
     }
 
+    /**Method for planting the bomb. The player cannot plant multiple bombs in one cell
+     */
     public void placeBomb() {
 
-        //if(game.getWorld(game.getNNowLevel()).isEmpty(getPosition()) && nBombs > 0) {
         if(nBombs > 0) {
             boolean can = true;
 
             for(Bomb b : bombs) {
                 if(b.getPosition().equals(getPosition())){
                     can = false;
+                    break;
                 }
             }
 
@@ -135,19 +149,19 @@ public class Player extends GameObject implements Movable {
 
     }
 
+    /**Method for opening the door
+     */
     public void openDoor() {
-
         Position nextPos = direction.nextPosition(getPosition());
         Decor decor = game.getWorld(game.getNNowLevel()).get(nextPos);
 
         if(!game.getWorld(game.getNNowLevel()).isEmpty(nextPos)) {
-            if(decor.getWayNextLevel() && decor.getIsNext() == 0 && keys > 0){
+            if(decor.getWayNextLevel() && decor.getWhatTransition() == 0 && keys > 0){
                 keys--;
                 game.getWorld(game.getNNowLevel()).set(nextPos, new DoorNextOpened());
                 game.getWorld(game.getNNowLevel()).setChangeMap(true);
             }
         }
-
     }
 
     @Override
@@ -168,12 +182,13 @@ public class Player extends GameObject implements Movable {
 
                 }
                 else if(decor.getWayNextLevel()) {
-                    if(decor.getIsNext() == 1) {
+                    //go to the next level
+                    if(decor.getWhatTransition() == 1) {
                         game.incDecNNowLevel(1);
                         incDecNowLevel(1);
                         game.setIsNewLevel(true, true);
-                    }
-                    else if(decor.getIsNext() == -1){
+                    }//go to previous level
+                    else if(decor.getWhatTransition() == -1){
                         game.incDecNNowLevel(-1);
                         incDecNowLevel(-1);
                         game.setIsNewLevel(true, false);
@@ -185,13 +200,23 @@ public class Player extends GameObject implements Movable {
                 Position nextNextPos = direction.nextPosition(nextPos);
                 boolean canMoveBox = true;
 
-                if(game.getWorld(game.getNNowLevel()).isEmpty(nextNextPos) && nextNextPos.inside(game.getWorld(game.getNNowLevel()).dimension)){
+                if(game.getWorld(getLevel()).isEmpty(nextNextPos) && nextNextPos.inside(game.getWorld(getLevel()).dimension)){
                     for(Monster m : monsters) {
                         if (m.getLevel() == getLevel()) {
-                            if (m.getPosition().equals(nextNextPos))
+                            if (m.getPosition().equals(nextNextPos)) {
                                 canMoveBox = false;
+                            }
                         }
                     }
+
+                    for(Bomb b : bombs) {
+                        if (b.getLevel() == getLevel()) {
+                            if (b.getPosition().equals(nextNextPos)) {
+                                canMoveBox = false;
+                            }
+                        }
+                    }
+
                     if(canMoveBox) {
                         game.getWorld(game.getNNowLevel()).set(nextNextPos, new Box());
                         game.getWorld(game.getNNowLevel()).clear(nextPos);
@@ -210,7 +235,7 @@ public class Player extends GameObject implements Movable {
     }
 
     public void update(long now) {
-
+        //cl = 1, since transparency and invulnerability lasts 1 second.
         if(!getCanBeDamaged()) {
             if(getCl() > -1) {
                 if(now - getTime() >= 1000000000) {
@@ -223,7 +248,6 @@ public class Player extends GameObject implements Movable {
                 setCanBeDamaged(true);
             }
         }
-
 
         if (moveRequested) {
             if (canMove(direction)) {

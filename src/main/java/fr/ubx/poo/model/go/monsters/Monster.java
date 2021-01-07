@@ -19,6 +19,11 @@ public class Monster extends GameObject implements Movable {
     /**Field of player */
     private Player player;
 
+    /**Monster constructor
+     * @param game current game
+     * @param position object's current position
+     * @param level the current level where the object is located
+     */
     public Monster(Game game, Position position, int level) {
         super(game, position, 1, level);
         this.direction = Direction.S;
@@ -46,7 +51,6 @@ public class Monster extends GameObject implements Movable {
 
     @Override
     public boolean canMove(Direction direction) {
-
         Position nextPos = direction.nextPosition(getPosition());
 
         if(nextPos.inside(game.getWorld(game.getNNowLevel()).dimension)) {
@@ -56,9 +60,7 @@ public class Monster extends GameObject implements Movable {
             }
         }
         return false;
-
     }
-
 
     @Override
     public void doMove(Direction direction) {
@@ -66,24 +68,32 @@ public class Monster extends GameObject implements Movable {
         setPosition(nextPos);
     }
 
+    /**The method updates the index of operations relative to the saved time
+     * After reaching the last index (cl), the monster chooses the direction and makes the movement
+     * @param now current game time
+     */
     public void update(long now) {
         if(getCl() > -1) {
+            //The reaction speed depends on the level at which the monster is
             long t =  900000000 - (long) getLevel() * 100000000;
-            if(t < 300000000)
-                t = 300000000;
+            //Instant movements are impossible.
+            if(t < 400000000) {
+                t = 400000000;
+            }
+            //cl = 1, since the monster needs to perform one action
             if(now - getTime() >= t) {
                 setTime(now);
-                setCl(getCl()-1);
+                setCl(getCl() - 1);
+
                 if(getCl() == 0) {
                     if(getLevel() == player.getLevel()) {
-                        if(getLevel() == game.getInitLevels()) {
+                        if(getLevel() == game.getInitLevels() - 1) {
                             randomMovement();
                             //directionalMovement();
                         }
                         else {
                             randomMovement();
                         }
-
                         moveRequested = false;
                     }
                 }
@@ -94,21 +104,13 @@ public class Monster extends GameObject implements Movable {
         }
 
         if(player.getLevel() == getLevel()) {
-           damage(1);
+            doDamage(1);
         }
     }
 
+    /**Method for choosing a random direction and requesting motion
+     */
     public void randomMovement() {
-        /*double d = Math.random()*4;
-
-        if((int) d == 0)
-            requestMove(Direction.N);
-        else if ((int)d == 1)
-            requestMove(Direction.E);
-        else if ((int)d == 2)
-            requestMove(Direction.S);
-        else
-            requestMove(Direction.W);*/
         requestMove(Direction.random());
 
         if (moveRequested) {
@@ -118,24 +120,14 @@ public class Monster extends GameObject implements Movable {
         }
     }
 
-    public void directionalMovement() {
-        Position playerPosition = player.getPosition();
-
-        int[][] table = new int[game.getWorld(getLevel()).dimension.height][game.getWorld(getLevel()).dimension.width];
-
-
-        if (moveRequested) {
-            if (canMove(direction)) {
-                doMove(direction);
-            }
-        }
-    }
-
-
-    public void damage(int j) {
+    /**Method for damaging a character
+     * @param damage damage dealt
+     */
+    public void doDamage(int damage) {
         Position center = getPosition();
-        if(player.getPosition().x == center.x && player.getPosition().y == center.y && player.getCanBeDamaged())
-            player.changeNLives(-j);
+        if(player.getPosition().equals(center) && player.getCanBeDamaged()) {
+            player.changeNLives(-damage);
+        }
     }
 
     public String toString() {

@@ -16,7 +16,9 @@ public abstract class Sprite {
     private final Pane layer;
     private ImageView imageView;
     private Image image;
+    /** Field for confirming the application of effects    */
     private boolean isChangedColor = false;
+    /** Field of effects    */
     private final ColorAdjust effect = new ColorAdjust();
 
     public Sprite(Pane layer, Image image) {

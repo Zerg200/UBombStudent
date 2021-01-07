@@ -13,6 +13,7 @@ public class SpriteMonster extends SpriteGameObject{
         super(layer, null, monster);
         updateImage();
     }
+
     @Override
     public void updateImage() {
         Monster monster = (Monster) go;

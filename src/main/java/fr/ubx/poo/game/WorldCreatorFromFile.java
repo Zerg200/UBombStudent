@@ -8,19 +8,18 @@ import java.util.Optional;
 
 public class WorldCreatorFromFile {
 
-    public int x = 0;
-    public int y = 0;
-
-
+    public int x;
+    public int y;
     public WorldEntity[][] mapEntities;
-
 
     public void getXYFromFile(BufferedReader bRead) throws IOException {
         int j;
         int i = bRead.read();
         while(i != -1) {
+
             char dataChar = (char) i;
             Optional<WorldEntity> owe = WorldEntity.fromCode(dataChar);
+
             if(owe.isEmpty()){
                 if(i == 10)
                     y++;
@@ -33,8 +32,10 @@ public class WorldCreatorFromFile {
             if(y == 0){
                 x++;
             }
+
             j = i;
             i = bRead.read();
+
             if(j != 10 && i == -1){
                 y++;
             }
@@ -42,16 +43,15 @@ public class WorldCreatorFromFile {
     }
 
     public void getMapFromFile(BufferedReader bRead) throws IOException {
-
         int xi = 0;
         int yi = 0;
         Optional<WorldEntity> owe;
 
         int i = bRead.read();
         while(i != -1) {
-
             char dataChar = (char) i;
             owe = WorldEntity.fromCode(dataChar);
+
             if(owe.isPresent()){
                 mapEntities[yi][xi] = owe.get();
                 xi++;
@@ -68,6 +68,8 @@ public class WorldCreatorFromFile {
     }
 
     public WorldCreatorFromFile(String path, String prefixMondes, int index) throws IOException {
+        x = 0;
+        y = 0;
 
         FileInputStream fIn = new FileInputStream(path+"\\"+prefixMondes + index + ".txt");
         BufferedReader bRead = new BufferedReader(new InputStreamReader(fIn));

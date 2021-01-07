@@ -35,19 +35,13 @@ public class Game {
         isNewLevel = new boolean[]{false, false};
         loadConfig(worldPath);
         loadLevels(worldPath);
-        Position positionPlayer = null;
+        Position positionPlayer;
         List<Position> positionsMonster;
 
         try {
-            for(; nLevel < world.size(); nLevel++) {
-                positionPlayer = world.get(nLevel).findPlayer(initLevels);
-                if(positionPlayer != null) {
-                    break;
-                }
-            }
-            player = new Player(this, positionPlayer, nLevel);
 
-            nLevel = 0;
+            positionPlayer = world.get(0).findPlayer();
+            player = new Player(this, positionPlayer, nLevel);
 
             for(; nLevel < world.size(); nLevel++) {
                 positionsMonster = world.get(nLevel).findMonsters(initLevels);

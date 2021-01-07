@@ -24,7 +24,8 @@ public class SpriteBomb extends SpriteGameObject{
         setImage(ImageFactory.getInstance().getNImageBomb(nImage));
         int cl = bomb.getCl();
 
-        if(cl > -1)
+        if(cl > -1) {
             setNImage(cl);
+        }
     }
 }

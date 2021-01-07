@@ -11,6 +11,10 @@ public class Heart extends Decor{
         return "Heart";
     }
 
+    /**
+     * Method for picking up a bonus to increase the number of lives.
+     * @param player player
+     */
     public void take(Player player) {
         player.changeNLives(1);
     }

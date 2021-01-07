@@ -7,6 +7,10 @@ public class BombRangeDec extends Decor{
         super(true, true, false, true, false);
     }
 
+    /**
+     * Method for picking up a bonus to decrease the range.
+     * @param player player
+     */
     public void take(Player player) {
         player.changeRange(-1);
     }

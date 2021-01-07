@@ -4,7 +4,7 @@ public class DoorPrevOpened extends Decor{
 
     public DoorPrevOpened() {
         super(true, false, false, false, true);
-        super.setIsNext(-1);
+        super.setWhatTransition(-1);
     }
 
     public String toString() {
