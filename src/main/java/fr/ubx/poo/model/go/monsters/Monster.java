@@ -10,10 +10,13 @@ import fr.ubx.poo.model.go.character.Player;
 
 public class Monster extends GameObject implements Movable {
 
+    /**Field of direction */
     Direction direction;
+    /**Field of move request */
     private boolean moveRequested = false;
+    /**Field of number of lives */
     private int lives = 1;
-    //The monster knows about the existence of the player
+    /**Field of player */
     private Player player;
 
     public Monster(Game game, Position position, int level) {
@@ -65,7 +68,7 @@ public class Monster extends GameObject implements Movable {
 
     public void update(long now) {
         if(getCl() > -1) {
-            long t =  800000000 - (long) getLevel() * 100000000;
+            long t =  900000000 - (long) getLevel() * 100000000;
             if(t < 300000000)
                 t = 300000000;
             if(now - getTime() >= t) {
@@ -96,7 +99,7 @@ public class Monster extends GameObject implements Movable {
     }
 
     public void randomMovement() {
-        double d = Math.random()*4;
+        /*double d = Math.random()*4;
 
         if((int) d == 0)
             requestMove(Direction.N);
@@ -105,7 +108,8 @@ public class Monster extends GameObject implements Movable {
         else if ((int)d == 2)
             requestMove(Direction.S);
         else
-            requestMove(Direction.W);
+            requestMove(Direction.W);*/
+        requestMove(Direction.random());
 
         if (moveRequested) {
             if (canMove(direction)) {

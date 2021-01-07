@@ -10,8 +10,6 @@ import fr.ubx.poo.model.go.monsters.Monster;
 
 import java.util.List;
 
-import static java.lang.Thread.sleep;
-
 public class Bomb extends GameObject {
 
     private int range;
