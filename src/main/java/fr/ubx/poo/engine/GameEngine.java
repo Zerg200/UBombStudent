@@ -60,17 +60,17 @@ public final class GameEngine {
         this.bombs = game.getBombs();
         nowLevel = 0;
         isNewLevel = new boolean[]{false, false};
-        initialize(stage, game, nowLevel);
+        initialize(stage, game);
         buildAndSetGameLoop();
     }
 
-    private void initialize(Stage stage, Game game, int level) {
+    private void initialize(Stage stage, Game game) {
         this.stage = stage;
         Group root = new Group();
         layer = new Pane();
 
-        int height = game.getWorld(level).dimension.height;
-        int width = game.getWorld(level).dimension.width;
+        int height = game.getWorld(nowLevel).dimension.height;
+        int width = game.getWorld(nowLevel).dimension.width;
 
         int sceneWidth = width * Sprite.size;
         int sceneHeight = height * Sprite.size;
@@ -86,7 +86,7 @@ public final class GameEngine {
         root.getChildren().add(layer);
         statusBar = new StatusBar(root, sceneWidth, sceneHeight, game);
         // Create decor sprites
-        game.getWorld(level).forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+        game.getWorld(nowLevel).forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
 
         if(spritesMonsters.size() == 0) {
@@ -95,7 +95,7 @@ public final class GameEngine {
             }
         }
 
-        if(level == player.getLevel()) {
+        if(nowLevel == player.getLevel()) {
             for(int i = 0; i < monsters.size(); i++) {
                 if(monsters.get(i).getLevel() == player.getLevel()) {
                     spritesMonsters.set(i, (SpriteMonster) SpriteFactory.createMonster(layer, monsters.get(i)));
@@ -263,7 +263,7 @@ public final class GameEngine {
     public void updateLevel() {
         stage.close();
 
-        initialize(stage, game, nowLevel);
+        initialize(stage, game);
         Position p;
         if(isNewLevel[1]) {
             p = game.getWorld(nowLevel).findDoorPrevOpened();
