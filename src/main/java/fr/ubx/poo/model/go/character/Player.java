@@ -31,8 +31,10 @@ public class Player extends GameObject implements Movable {
     private int range;
     private int keys;
     private boolean winner;
-    private List<Monster> monsters;
-    private List<Bomb> bombs;
+    /** The player can interact with monsters */
+    private final List<Monster> monsters;
+    /** The player can interact with bombs */
+    private final List<Bomb> bombs;
 
     /**Player constructor
      * @param game current game
@@ -153,13 +155,13 @@ public class Player extends GameObject implements Movable {
      */
     public void openDoor() {
         Position nextPos = direction.nextPosition(getPosition());
-        Decor decor = game.getWorld(game.getNNowLevel()).get(nextPos);
+        Decor decor = game.getWorld(getLevel()).get(nextPos);
 
-        if(!game.getWorld(game.getNNowLevel()).isEmpty(nextPos)) {
+        if(!game.getWorld(getLevel()).isEmpty(nextPos)) {
             if(decor.getWayNextLevel() && decor.getWhatTransition() == 0 && keys > 0){
                 keys--;
-                game.getWorld(game.getNNowLevel()).set(nextPos, new DoorNextOpened());
-                game.getWorld(game.getNNowLevel()).setChangeMap(true);
+                game.getWorld(getLevel()).set(nextPos, new DoorNextOpened());
+                game.getWorld(getLevel()).setChangeMap(true);
             }
         }
     }
@@ -168,8 +170,8 @@ public class Player extends GameObject implements Movable {
     public boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
 
-        if(nextPos.inside(game.getWorld(game.getNNowLevel()).dimension)) {
-            Decor decor = game.getWorld(game.getNNowLevel()).get(nextPos);
+        if(nextPos.inside(game.getWorld(getLevel()).dimension)) {
+            Decor decor = game.getWorld(getLevel()).get(nextPos);
 
             if(decor == null) {
                 return true;
@@ -177,21 +179,17 @@ public class Player extends GameObject implements Movable {
             else if(decor.getPassability()){
                 if(decor.getCollectables()) {
                     decor.take(this);
-                    game.getWorld(game.getNNowLevel()).clear(nextPos);
-                    game.getWorld(game.getNNowLevel()).setChangeMap(true);
+                    game.getWorld(getLevel()).clear(nextPos);
+                    game.getWorld(getLevel()).setChangeMap(true);
 
                 }
                 else if(decor.getWayNextLevel()) {
                     //go to the next level
                     if(decor.getWhatTransition() == 1) {
-                        game.incDecNNowLevel(1);
                         incDecNowLevel(1);
-                        game.setIsNewLevel(true, true);
                     }//go to previous level
                     else if(decor.getWhatTransition() == -1){
-                        game.incDecNNowLevel(-1);
                         incDecNowLevel(-1);
-                        game.setIsNewLevel(true, false);
                     }
                 }
                 return true;
@@ -218,9 +216,9 @@ public class Player extends GameObject implements Movable {
                     }
 
                     if(canMoveBox) {
-                        game.getWorld(game.getNNowLevel()).set(nextNextPos, new Box());
-                        game.getWorld(game.getNNowLevel()).clear(nextPos);
-                        game.getWorld(game.getNNowLevel()).setChangeMap(true);
+                        game.getWorld(getLevel()).set(nextNextPos, new Box());
+                        game.getWorld(getLevel()).clear(nextPos);
+                        game.getWorld(getLevel()).setChangeMap(true);
                         return true;
                     }
                 }

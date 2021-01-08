@@ -8,12 +8,15 @@ import java.util.Optional;
 
 public class WorldCreatorFromFile {
 
-    public int x;
-    public int y;
-    public WorldEntity[][] mapEntities;
+    private int x;
+    private int y;
+    private WorldEntity[][] mapEntities;
 
+    /**Method calculates the height and width of the loaded map
+     * @param bRead buffer with loaded file.
+     */
     public void getXYFromFile(BufferedReader bRead) throws IOException {
-        int j;
+        int j; //Used if there is no next line character at the end of the level file.
         int i = bRead.read();
         while(i != -1) {
 
@@ -25,6 +28,8 @@ public class WorldCreatorFromFile {
                     y++;
                 else {
                     System.err.println("Error loading level");
+                    x = 0;
+                    y = 0;
                     break;
                 }
 
@@ -42,6 +47,9 @@ public class WorldCreatorFromFile {
         }
     }
 
+    /**Method for setting items from file to map
+     * @param bRead buffer with loaded file.
+     */
     public void getMapFromFile(BufferedReader bRead) throws IOException {
         int xi = 0;
         int yi = 0;
@@ -66,20 +74,33 @@ public class WorldCreatorFromFile {
             i = bRead.read();
         }
     }
-
-    public WorldCreatorFromFile(String path, String prefixMondes, int index) throws IOException {
+    /**World creator from file constructor
+     * @param path path to files
+     * @param prefixWorlds world standard name
+     * @param index world index
+     */
+    public WorldCreatorFromFile(String path, String prefixWorlds, int index) throws IOException {
         x = 0;
         y = 0;
 
-        FileInputStream fIn = new FileInputStream(path+"\\"+prefixMondes + index + ".txt");
-        BufferedReader bRead = new BufferedReader(new InputStreamReader(fIn));
-        getXYFromFile(bRead);
-        fIn.getChannel().position(0);
-        bRead = new BufferedReader(new InputStreamReader(fIn));
+        try(FileInputStream fIn = new FileInputStream(path+"\\"+prefixWorlds + index + ".txt")) {
+            BufferedReader bRead = new BufferedReader(new InputStreamReader(fIn));
+            getXYFromFile(bRead);
+            if(x > 0 && y > 0) {
+                fIn.getChannel().position(0);
+                bRead = new BufferedReader(new InputStreamReader(fIn));
 
-        mapEntities = new WorldEntity[y][x];
-        getMapFromFile(bRead);
+                mapEntities = new WorldEntity[y][x];
+                getMapFromFile(bRead);
+            }
+            bRead.close();
+        }
+        catch (IOException ex) {
+            System.err.println("Error loading level from path");
+        }
+    }
 
-        bRead.close();
+    public WorldEntity[][] getMapEntities() {
+        return mapEntities;
     }
 }

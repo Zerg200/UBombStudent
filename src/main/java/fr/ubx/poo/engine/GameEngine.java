@@ -38,17 +38,19 @@ public final class GameEngine {
     private static AnimationTimer gameLoop;
     private final String windowTitle;
     private final Game game;
-    private Player player;
-    private List<Monster> monsters;
-    private List<Bomb> bombs;
+    private final Player player;
+    private final List<Monster> monsters;
+    private final List<Bomb> bombs;
     private final List<Sprite> sprites = new ArrayList<>();
     private StatusBar statusBar;
     private Pane layer;
     private Input input;
     private Stage stage;
     private Sprite spritePlayer;
-    private List<SpriteMonster> spritesMonsters = new ArrayList<>();
-    private List<SpriteBomb> spritesBombs = new ArrayList<>();
+    private final List<SpriteMonster> spritesMonsters = new ArrayList<>();
+    private final List<SpriteBomb> spritesBombs = new ArrayList<>();
+    private int nowLevel;
+    private boolean[] isNewLevel;
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
         this.windowTitle = windowTitle;
@@ -56,7 +58,9 @@ public final class GameEngine {
         this.player = game.getPlayer();
         this.monsters = game.getMonsters();
         this.bombs = game.getBombs();
-        initialize(stage, game, 0);
+        nowLevel = 0;
+        isNewLevel = new boolean[]{false, false};
+        initialize(stage, game, nowLevel);
         buildAndSetGameLoop();
     }
 
@@ -92,21 +96,17 @@ public final class GameEngine {
         }
 
         if(level == player.getLevel()) {
-
             for(int i = 0; i < monsters.size(); i++) {
                 if(monsters.get(i).getLevel() == player.getLevel()) {
                     spritesMonsters.set(i, (SpriteMonster) SpriteFactory.createMonster(layer, monsters.get(i)));
                 }
             }
             for(int i = 0; i < bombs.size(); i++) {
-                if(bombs.get(i).getNLives() == player.getLevel()) {
+                if(bombs.get(i).getLevel() == player.getLevel()) {
                     spritesBombs.set(i, (SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(i)));
                 }
             }
-
         }
-
-
     }
 
     protected final void buildAndSetGameLoop() {
@@ -172,13 +172,7 @@ public final class GameEngine {
 
     private void update(long now) {
 
-        if(game.getIsNewLevel()[0]){
-            updateLevel();
-        }
-
         player.update(now);
-        updateBombs(now);
-        updateMonsters(now);
 
         if(player.getNLives() <= 0)
             player.setAliveFalse();
@@ -191,11 +185,28 @@ public final class GameEngine {
             gameLoop.stop();
             showMessage("Gagné", Color.BLUE);
         }
+
+        if(nowLevel > player.getLevel()) {
+            isNewLevel[0] = true;
+            isNewLevel[1] = false;
+            nowLevel = player.getLevel();
+        }
+        else if (nowLevel < player.getLevel()){
+            isNewLevel[0] = true;
+            isNewLevel[1] = true;
+            nowLevel = player.getLevel();
+        }
+
+        if(isNewLevel[0]){
+            updateLevel();
+        }
+        updateBombs(now);
+        updateMonsters(now);
     }
 
     private void render() {
 
-        if(game.getWorld(game.getNNowLevel()).getChangeMap()){
+        if(game.getWorld(player.getLevel()).getChangeMap()){
             removeDecorSprites();
         }
 
@@ -222,26 +233,28 @@ public final class GameEngine {
     public void removeDecorSprites() {
         sprites.forEach(Sprite::remove);
         sprites.removeAll(sprites);
-        game.getWorld(game.getNNowLevel()).forEach( (pos, d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
-        game.getWorld(game.getNNowLevel()).setChangeMap(false);
+        game.getWorld(player.getLevel()).forEach( (pos, d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
+        game.getWorld(player.getLevel()).setChangeMap(false);
     }
 
     public void bombSpritesRender() {
         if(spritesBombs.isEmpty()) {
             spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
             spritesBombs.get(0).render();
-
         }
         else {
             if(bombs.size() > spritesBombs.size()) {
                 spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(spritesBombs.size())));
-                if(game.getNNowLevel() == player.getLevel() && !game.getBombs().isEmpty())
+                if(nowLevel == player.getLevel() && !game.getBombs().isEmpty()) {
+                    System.out.println("!");
                     spritesBombs.get(spritesBombs.size()-1).render();
+                }
             }
             else {
-                for (SpriteBomb sp : spritesBombs) {
-                    if(game.getNNowLevel() == player.getLevel() && !game.getBombs().isEmpty())
-                        sp.render();
+                for (SpriteBomb spB : spritesBombs) {
+                    if(nowLevel == player.getLevel() && !game.getBombs().isEmpty()) {
+                        spB.render();
+                    }
                 }
             }
         }
@@ -249,17 +262,18 @@ public final class GameEngine {
 
     public void updateLevel() {
         stage.close();
-        initialize(stage, game, game.getNNowLevel());
+
+        initialize(stage, game, nowLevel);
         Position p;
-        if(game.getIsNewLevel()[1]) {
-            p = game.getWorld(game.getNNowLevel()).findDoorPrevOpened();
+        if(isNewLevel[1]) {
+            p = game.getWorld(nowLevel).findDoorPrevOpened();
         }
         else {
-            p = game.getWorld(game.getNNowLevel()).findDoorNextOpened();
+            p = game.getWorld(nowLevel).findDoorNextOpened();
         }
         player.setPosition(p);
         player.setDirection(S);
-        game.setIsNewLevel(false, false);
+        isNewLevel[0] = false;
     }
 
     public void updateBombs(long now) {

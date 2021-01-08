@@ -17,7 +17,7 @@ public class Monster extends GameObject implements Movable {
     /**Field of number of lives */
     private int lives = 1;
     /**Field of player */
-    private Player player;
+    private final Player player;
 
     /**Monster constructor
      * @param game current game
@@ -53,8 +53,8 @@ public class Monster extends GameObject implements Movable {
     public boolean canMove(Direction direction) {
         Position nextPos = direction.nextPosition(getPosition());
 
-        if(nextPos.inside(game.getWorld(game.getNNowLevel()).dimension)) {
-            Decor decor = game.getWorld(game.getNNowLevel()).get(nextPos);
+        if(nextPos.inside(game.getWorld(player.getLevel()).dimension)) {
+            Decor decor = game.getWorld(player.getLevel()).get(nextPos);
             if(decor == null || decor.getPassability() && decor.getDestructible()) {
                 return true;
             }

@@ -21,9 +21,9 @@ public class Bomb extends GameObject {
     /** The bomb can interact with other bombs */
     private List<Bomb> bombs;
     /** The bomb can interact with the player */
-    private Player player;
+    private final Player player;
     /** The bomb can interact with monsters */
-    private List<Monster> monsters;
+    private final List<Monster> monsters;
 
     public int getRange() {
         return range;

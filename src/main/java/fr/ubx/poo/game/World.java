@@ -70,7 +70,7 @@ public class World {
     public Position findDoorNextOpened(){
         //Since a closed door and an open door are formed in the same place,
         // there is an opportunity to use the coordinates of a closed door,
-        // since an open door is not created in raw
+        // since an open door is not in raw
         for (int x = 0; x < dimension.width; x++) {
             for (int y = 0; y < dimension.height; y++) {
                 if (raw[y][x] == WorldEntity.DoorNextClosed) {
