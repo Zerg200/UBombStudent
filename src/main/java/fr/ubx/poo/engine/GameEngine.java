@@ -49,7 +49,13 @@ public final class GameEngine {
     private Sprite spritePlayer;
     private final List<SpriteMonster> spritesMonsters = new ArrayList<>();
     private final List<SpriteBomb> spritesBombs = new ArrayList<>();
+    /** Field of current level number   */
     private int nowLevel;
+    /** Transition states between levels
+     * {false, false} - no transition
+     * {true, true} - transition to the next level
+     * {true, false} - transition to the previous level
+     */
     private boolean[] isNewLevel;
 
     public GameEngine(final String windowTitle, Game game, final Stage stage) {
@@ -89,12 +95,14 @@ public final class GameEngine {
         game.getWorld(nowLevel).forEach( (pos,d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         spritePlayer = SpriteFactory.createPlayer(layer, player);
 
+        //Used on first initialization
         if(spritesMonsters.size() == 0) {
             for(Monster m : monsters) {
                 spritesMonsters.add((SpriteMonster) SpriteFactory.createMonster(layer, m));
             }
         }
 
+        //Used when changing levels
         if(nowLevel == player.getLevel()) {
             for(int i = 0; i < monsters.size(); i++) {
                 if(monsters.get(i).getLevel() == player.getLevel()) {
@@ -186,6 +194,7 @@ public final class GameEngine {
             showMessage("Gagné", Color.BLUE);
         }
 
+        //Determination of the player's transition to the next level or previous.
         if(nowLevel > player.getLevel()) {
             isNewLevel[0] = true;
             isNewLevel[1] = false;
@@ -207,7 +216,7 @@ public final class GameEngine {
     private void render() {
 
         if(game.getWorld(player.getLevel()).getChangeMap()){
-            removeDecorSprites();
+            updateDecorSprites();
         }
 
         if(!bombs.isEmpty()) {
@@ -219,6 +228,7 @@ public final class GameEngine {
         spritePlayer.render();
 
         for (int i = 0; i < spritesMonsters.size(); i++) {
+            //If the player and the monster are not on the same level, then the sprite is not processed.
             if(monsters.get(i).getLevel() == player.getLevel()) {
                 spritesMonsters.get(i).render();
             }
@@ -230,27 +240,34 @@ public final class GameEngine {
     }
 
 
-    public void removeDecorSprites() {
+    /**Method for updating decor sprites in case of their change
+     */
+    public void updateDecorSprites() {
         sprites.forEach(Sprite::remove);
         sprites.removeAll(sprites);
         game.getWorld(player.getLevel()).forEach( (pos, d) -> sprites.add(SpriteFactory.createDecor(layer, pos, d)));
         game.getWorld(player.getLevel()).setChangeMap(false);
     }
 
+    /**Method is applied to bomb sprites if they are updated or removed when the bomb is destroyed
+     */
     public void bombSpritesRender() {
+        //If the bomb was planted first
         if(spritesBombs.isEmpty()) {
             spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(0)));
             spritesBombs.get(0).render();
         }
         else {
+            //If new bombs were planted
             if(bombs.size() > spritesBombs.size()) {
                 spritesBombs.add((SpriteBomb) SpriteFactory.createBomb(layer, bombs.get(spritesBombs.size())));
+                //If the player and the bomb are not on the same level, then the sprite is not processed.
                 if(nowLevel == player.getLevel() && !game.getBombs().isEmpty()) {
-                    System.out.println("!");
                     spritesBombs.get(spritesBombs.size()-1).render();
                 }
             }
             else {
+                //Processing sprites of existing bombs
                 for (SpriteBomb spB : spritesBombs) {
                     if(nowLevel == player.getLevel() && !game.getBombs().isEmpty()) {
                         spB.render();
@@ -260,11 +277,14 @@ public final class GameEngine {
         }
     }
 
+    /**Method is used to update levels
+     */
     public void updateLevel() {
         stage.close();
 
         initialize(stage, game);
         Position p;
+        //Setting the coordinates of the player relative to the new level
         if(isNewLevel[1]) {
             p = game.getWorld(nowLevel).findDoorPrevOpened();
         }
@@ -276,13 +296,16 @@ public final class GameEngine {
         isNewLevel[0] = false;
     }
 
+    /**Method is used to update bombs or delete their instances or sprites
+     * @param now current game time
+     */
     public void updateBombs(long now) {
         Iterator<Bomb> iteratorterBombs = bombs.iterator();
         Iterator<SpriteBomb> iteratorSpritesBombs = spritesBombs.iterator();
 
         while(iteratorterBombs.hasNext()) {
             Bomb bomb = iteratorterBombs.next();
-
+            //If the player has just planted a bomb
             if(bomb.getIsNew()){
                 bomb.setTime(now);
                 bomb.setIsNew(false);
@@ -301,6 +324,9 @@ public final class GameEngine {
         }
     }
 
+    /**Method is used to update monsters or delete their instances or sprites
+     * @param now current game time
+     */
     public void updateMonsters(long now) {
         Iterator<Monster> iteratorterMonsters = monsters.iterator();
         Iterator<SpriteMonster> iteratorSpritesMonsters = spritesMonsters.iterator();

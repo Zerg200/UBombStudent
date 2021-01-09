@@ -31,7 +31,7 @@ public class Decor extends Entity {
      * @param collectables is it possible to collect this decor
      * @param movability is it possible to move this decor
      * @param destructible is it possible to destroy this decor
-     * @param wayNextLevel is it possible to use this decor as a transition to another level or to another door
+     * @param wayNextLevel is it possible to use this decor as a transition to another level
      */
     public Decor(boolean passability, boolean collectables, boolean movability, boolean destructible, boolean wayNextLevel) {
         this.passability = passability;
